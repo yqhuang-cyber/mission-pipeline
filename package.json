@@ -1,0 +1,19 @@
+{
+  "name": "mission-pipeline",
+  "private": true,
+  "scripts": {
+    "dev": "pnpm -r --parallel --filter @mission-pipeline/api --filter @mission-pipeline/web dev",
+    "dev:api": "pnpm --filter @mission-pipeline/api dev",
+    "dev:web": "pnpm --filter @mission-pipeline/web dev",
+    "db:up": "docker compose up -d postgres",
+    "db:down": "docker compose down",
+    "db:migrate": "pnpm --filter @mission-pipeline/api exec prisma migrate dev",
+    "db:generate": "pnpm --filter @mission-pipeline/api exec prisma generate",
+    "typecheck": "pnpm -r typecheck",
+    "test": "pnpm --filter @mission-pipeline/api test"
+  },
+  "engines": {
+    "node": ">=20"
+  },
+  "packageManager": "pnpm@9.15.0"
+}

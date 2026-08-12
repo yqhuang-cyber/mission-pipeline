@@ -1,0 +1,221 @@
+﻿Phase,Script Step,Step,Component,Display Text,Display Image,Video Play,Kai Script 1,Kai Script 2,Kai Feedback Script - Correct,Kai Feedback Script - Wrong,Transition Script,Knowledge point
+Phase 1 - Mission Intro,1 · MISSION ENTRY — Warm Up,Welcome,CMP-01 · 课前寒暄,NA,,,"Welcome back, [User Name]. Last mission, you learnt how to find the right person. 你是 王 老师吗？",,,,"Today, you'll meet friends from different countries.",Word: 朋友
+Phase 1 - Mission Intro,1 · MISSION ENTRY — Warm Up,Mission Setup,CMP-04 · Mission发布,"【任务标题】Meeting Friends from Around the World.
+[开始按钮] Let's go",,,Ready to meet friends from around the world?,,,,START MISSION,Word: 朋友 / 你的 / 中国 / 美国
+Phase 1 - Mission Intro,2 · OPENING STORY — Experience First,Opening Story,CMP-03 · 视频播放,NA,,,"First, watch. Don't try to understand every word. Just notice: Where is everyone from? Who is whose friend?",,,,,"Word: 哪国 / 美国 / 英国 / 朋友
+Pattern: 你是哪国人？ / 她/他是你的朋友吗？"
+Phase 1 - Mission Intro,2 · OPENING STORY — Experience First,Warm-up,CMP-33 · 选择题（传统版）,"[顶标] Quiz
+【题目】 How many countries did you hear?
+【A】 1
+【B】 2
+【C】 3
+【答案】C",,,"Hmm.
+Names. Countries. Friends.
+A lot is happening.",How many did you catch? Tap one.,Good — keep that in mind.,Not yet — listen again for the key words.,"Keep the story in mind. We'll come back to it.
+We'll come back to it.",Word: 哪国
+Phase 2 - Knowledge Discovery,3 · CONTEXT STORY — WHERE ARE YOU FROM?,Discover context: 你是哪国人？,CMP-03 · 视频播放,NA,,,,,,,The teacher already knows Tom's name. She is asking something new. Listen again.,"Word: 哪国 / 英国
+Pattern: 你是哪国人？"
+Phase 2 - Knowledge Discovery,3 · CONTEXT STORY — WHERE ARE YOU FROM?,Discover meaning: 你是哪国人？,CMP-33 · 选择题（传统版）,"[顶标] Quiz
+【题目】 你是哪国人？
+【A】 Tom's name
+【B】 Where Tom is from
+【C】 If Tom is a teacher
+【答案】 B",,,你是哪国人？,What is the teacher trying to find out?,Exactly. She is asking where Tom is from.,Not yet — listen again for the key words.,,"Word: 哪国
+Pattern: 你是哪国人？"
+Phase 2 - Knowledge Discovery,3 · CONTEXT STORY — WHERE ARE YOU FROM?,Discover sound: 你是哪国人？,CMP-08 · 听音跟读,"【汉字】 你是哪国人
+【拼音】 Nǐ shì nǎ guó rén",,,Good. You already know 你. You already know 是.,Now you can ask: 你是哪国人？,Good — keep that in mind.,Not yet,,"Word: 哪国
+Pattern: 你是哪国人？"
+Phase 2 - Knowledge Discovery,4 · CONNECT TO WHAT I KNOW — NAME QUESTION VS COUNTRY QUESTION,Discover pattern: name vs country Q,CMP-11 · 句型观察,"【例句】 你叫什么名字？
+【例句】 你是哪国人？",,,"You already know how to ask someone’s name.
+你叫什么名字？
+Now you can ask where someone is from.
+你是哪国人？",,,,"Two questions.
+Both help you get to know someone.","Word: 哪国
+Pattern: 你是哪国人？"
+Phase 2 - Knowledge Discovery,4 · CONNECT TO WHAT I KNOW — NAME QUESTION VS COUNTRY QUESTION,Discover recall: 你叫什么名字？,CMP-13 · 单项选择,"【焦点】 名字
+【题目】 你叫什么名字？
+【A】 Name
+【B】 Country
+【C】 NA
+【答案】A",,,Listen and choose. 你叫什么名字？,你叫什么名字？,Good — keep that in mind.,Not yet,,SocialExpression: classroom rapport
+Phase 2 - Knowledge Discovery,4 · CONNECT TO WHAT I KNOW — NAME QUESTION VS COUNTRY QUESTION__2,Discover meaning: 你是哪国人？,CMP-13 · 单项选择,"【焦点】 国
+【题目】 你是哪国人？
+【A】 Name
+【B】 Country
+【C】 NA
+【答案】 B",,,Listen and choose.,你是哪国人？,Good — keep that in mind.,Not yet,"One question finds out a name.
+One question finds out where someone is from.","Word: 哪国
+Pattern: 你是哪国人？"
+Phase 2 - Knowledge Discovery,5 · DISCOVERY — COUNTRY + 人,Discover context: country + 人,CMP-03 · 视频播放,NA,,,,,,,,Word: 中国 / 美国 / 英国
+Phase 2 - Knowledge Discovery,5 · DISCOVERY — COUNTRY + 人,Discover words: 英国人,CMP-10 · 图文卡片,"【汉字】 英国人
+【拼音】 yīng guó rén
+[英文] The British",,,"Tom is from the UK.
+他是英国人。",,,,,Word: 英国
+Phase 2 - Knowledge Discovery,5 · DISCOVERY — COUNTRY + 人__2,Discover words: 美国人,CMP-10 · 图文卡片,"【汉字】 美国人
+【拼音】 měi guó rén
+[英文] American",,,"Emma is from the United States.
+她是美国人。",,,,,Word: 美国
+Phase 2 - Knowledge Discovery,5 · DISCOVERY — COUNTRY + 人__3,Discover words: 中国人,CMP-10 · 图文卡片,"【汉字】 中国人
+【拼音】 zhōng guó rén
+[英文] China",,,"Jayden is from China.
+他是中国人
+",,,,,Word: 中国 / 美国 / 英国
+Phase 2 - Knowledge Discovery,5 · DISCOVERY — COUNTRY + 人,Discover pattern: country + 人,CMP-13 · 单项选择,"【焦点】 人
+【题目】What do you think 人 is doing here?
+【A】 Asking a question
+【B】 Talking about a person from that country
+【C】 Saying goodbye
+【答案】 B",,,"What do you notice?
+Exactly. The same character appears every time.",What do you think 人 is doing here?,Exactly!,Not quite — try once more.,,word：人
+Phase 2 - Knowledge Discovery,5 · DISCOVERY — COUNTRY + 人,Discover pattern: 我是___人,CMP-07 · 句型学习,"【左侧】 中国人 
+美国人
+英国人
+【右侧】 Country + 人
+【符号】 +
+【高亮】 人",,,Country + 人.,,,,A person from that country.,Word: 中国 / 美国 / 英国
+Phase 2 - Knowledge Discovery,6 · PRACTICE — BUILD THE COUNTRY WORDS,Discover words: 中国人,CMP-12 · 词块造句,"【题目】 Let's try to build
+【字块】 中国，人
+【答案】 中国人",,,Let's try. Screen shows China. Student builds: 中国 + 人 Student says: 中国人 Kai: 中国人。,Let's try.,Good — keep that in mind.,Not quite — try once more.,Student builds: 中国 + 人 Student says: 中国人 Kai: 中国人。,Word: 中国
+Phase 2 - Knowledge Discovery,6 · PRACTICE — BUILD THE COUNTRY WORDS__2,Discover words: 美国人,CMP-12 · 词块造句,"【题目】 Build the word for America.
+【字块】 美国，人
+【答案】 美国人",,,Screen shows America. Student builds: 美国 + 人 Student says: 美国人 Kai: 美国人。,Your turn — try it.,Good — keep that in mind.,Not quite — try once more.,Student builds: 美国 + 人 Student says: 美国人 Kai: 美国人。,Word: 美国
+Phase 2 - Knowledge Discovery,6 · PRACTICE — BUILD THE COUNTRY WORDS__3,Discover words: 英国人,CMP-12 · 词块造句,"【题目】 Build the word for UK.
+【字块】 英国，人
+【答案】 英国人",,,Screen shows UK. Student builds: 英国 + 人 Student says: 英国人 Kai: 英国人。 Kai: You found the pattern.,Your turn — try it.,Good — keep that in mind.,Not quite — try once more.,Now use it.,Word: 英国
+Phase 2 - Knowledge Discovery,7 · USE BEFORE MEMORY — WHERE ARE YOU FROM?,Discover use: 我是___人,CMP-15 · 角色扮演对话,"【Kai】 请问，你是哪国人？
+【user】 我是中国人。",,,,,,,Got it.  我是中国人。 You just said where you are from in Chinese.,"Word: 中国 
+Pattern: 我是中国人"
+Phase 2 - Knowledge Discovery,7 · USE BEFORE MEMORY — WHERE ARE YOU FROM?,Discover sentence: 他是英国人,CMP-35 · 发音练习,"【汉字】 他是英国人
+【拼音】 Tā shì yīnɡ ɡuó rén
+[英文] He is from the UK.",,,Tom is from the UK. Say it.,Say it.,Good — keep that in mind.,Not quite — try once more.,,Word: 英国
+Phase 2 - Knowledge Discovery,7 · USE BEFORE MEMORY — WHERE ARE YOU FROM?__2,Discover sentence: 她是美国人,CMP-35 · 发音练习,"【汉字】 她是英国人
+【拼音】 Tā shì yīnɡ ɡuó rén
+[英文] She is from the US.",,,Emma is from America.,Say it.,Good — keep that in mind.,Not quite — try once more.,,Word: 美国
+Phase 2 - Knowledge Discovery,7 · USE BEFORE MEMORY — WHERE ARE YOU FROM?__3,Discover sentence: 她也是美国人,CMP-35 · 发音练习,"【汉字】 她也是美国人
+【拼音】 Tā yě shì meǐ ɡuó rén
+[英文] She is also from the US.",,,Anna is also from America,Say it,Good — keep that in mind.,Not quite — try once more.,,Word: 美国
+Phase 2 - Knowledge Discovery,7 · USE BEFORE MEMORY — WHERE ARE YOU FROM?__4,Discover sentence: 他是中国人,CMP-35 · 发音练习,"【汉字】 他是中国人
+【拼音】 Tā yě shì meǐ ɡuó rén
+[英文] He is from China.",,,Jayden is from China.,Say it,Good — keep that in mind.,Not quite — try once more.,好！ You can now talk about where other people are from too.,Word: 中国 / 哪国
+Phase 2 - Knowledge Discovery,8 · DISCOVERY — ASK ABOUT HIM / HER,Discover question: 他是哪国人？,CMP-13 · 单项选择,"【焦点】 他
+【题目】 他是___？
+【A】 他是哪国人？
+【B】 他叫什么名字？
+【C】 他是老师吗？
+【答案】 A",,,You can ask you.,But what if we ask about him?,"Exactly.
+他是哪国人？",Not quite — try once more.,,"Word: 哪国
+Pattern: 你是哪国人？"
+Phase 2 - Knowledge Discovery,8 · DISCOVERY — ASK ABOUT HIM / HER,Discover sentence: 她是哪国人？,CMP-12 · 词块造句,"【题目】 Build to ask about her.
+【字块】 她，是，哪国人
+【答案】 她是哪国人？",,,Now ask about her.,Build the question.,"Perfect.
+You already knew 他 and 她.",Not quite — try once more.,Now you can use them in a new question.,"Word: 她
+Pattern: 她是哪国人？"
+Phase 2 - Knowledge Discovery,9 · CONTEXT STORY — IS SHE YOUR FRIEND?,Discover context: 她是你的朋友吗？,CMP-03 · 视频播放,NA,,,,,,,The teacher is asking about Emma. Listen again.,"Word: 朋友 / 我的 / 你的
+Pattern: 她/他是你的朋友吗？"
+Phase 2 - Knowledge Discovery,9 · CONTEXT STORY — IS SHE YOUR FRIEND?,Discover meaning: 朋友,CMP-13 · 单项选择,"【焦点】 朋友
+【题目】 她是你的朋友吗？
+【A】 Is she your teacher?
+【B】 Is she your friend?
+【C】 Is she from China?
+【答案】 B",,,"她是你的朋友吗？
+You already know: 她, 是, 吗.
+So this is a question.",What is the teacher asking?,"Exactly.
+She is asking:
+Is she your friend?",Not quite — try once more.,,"Word: 中国 / 朋友 / 你的
+Pattern: 她/他是你的朋友吗？"
+Phase 2 - Knowledge Discovery,10 · DISCOVERY — 的 (Possessive),Discover pattern: 的,CMP-13 · 单项选择,"【焦点】 的
+【题目】 What do you think 的 is doing?
+【A】 Shows who someone belongs or connects to
+【B】 Makes a question
+【C】 Says no
+【答案】 A",,,"Look carefully. You know: 你 = you, 我 = I / me.",What do you think 的 is doing?,Exactly. 我的 means my. 你的 means your.,Not quite — look at 你的 / 我的 again.,我的 means my. 你的 means your.,"Word: 的
+Pattern: 我的 / 你的"
+Phase 2 - Knowledge Discovery,10 · DISCOVERY — 的 (Possessive),Discover words: 他的 / 她的,CMP-12 · 词块造句,"【题目】 Build: 他的，她的
+【字块】 他，她，的
+【答案】 他的，她的",,,Can you predict these? 他 → ? 她 → ?,Build: 他的 / 她的.,You found it.,Not quite — try 他 + 的.,我 → 我的 · 你 → 你的 · 他 → 他的 · 她 → 她的,Word: 的 / 他的 / 她的
+Phase 2 - Knowledge Discovery,10 · DISCOVERY — 的 (Possessive),Discover pattern: X → X的,CMP-11 · 句型观察,"[顶标] Pattern
+【例句】 我 → 我的
+【例句】 你 → 你的
+【例句】 他 → 他的
+【例句】 她 → 她的",,,Look — the full pattern.,,,,You can now make 我的 / 你的 / 他的 / 她的.,"Word: 的
+Pattern: 我的 / 你的 / 他的 / 她的"
+Phase 2 - Knowledge Discovery,11 · DISCOVERY — 朋友 (Friend),Discover context: 她是我的朋友,CMP-03 · 视频播放,NA,,,Listen again — Tom says: 她是我的朋友。,,,,Freeze. Keep that line in mind.,"Word: 朋友
+Pattern: 她是我的朋友。"
+Phase 2 - Knowledge Discovery,11 · DISCOVERY — 朋友 (Friend),Discover words: 同学,CMP-09 · 全屏大图,NA,,,Tom and Emma know each other. They study together.,,,,You already know: 同学. Emma is Tom's 同学. But Tom says another word.,Word: 同学
+Phase 2 - Knowledge Discovery,11 · DISCOVERY — 朋友 (Friend)__2,Discover context: 朋友,CMP-03 · 视频播放,NA,,,Listen once more: 她是我的朋友。,,,,One word is new here — listen for it.,"Word: 朋友
+Pattern: 她是我的朋友。"
+Phase 2 - Knowledge Discovery,11 · DISCOVERY — 朋友 (Friend),Discover meaning: 朋友,CMP-13 · 单项选择,"【焦点】 朋友
+【题目】 What do you think 朋友 means?
+【A】 Teacher
+【B】 Friend
+【C】 Student
+【答案】 B",,,Look at them.,What do you think 朋友 means?,Exactly.,Not quite — look at Tom and Emma together.,朋友 means friend.,Word: 朋友
+Phase 2 - Knowledge Discovery,11 · DISCOVERY — 朋友 (Friend),Discover sound: 朋友,CMP-08 · 听音跟读,"【汉字】 朋友
+【拼音】 péng you
+[重读] 朋 péng",,,朋友 — péng you — friend.,Listen and repeat: 朋友.,Good.,Not yet — listen again: 朋友.,Emma is Tom's classmate. She is also his friend.,Word: 朋友
+Phase 2 - Knowledge Discovery,"12 · PATTERN Discovery — ""是 + 的 + 朋友""",Discover pattern: 是 + 的 + 朋友,CMP-07 · 句型学习,"[顶标] Pattern
+【左侧】 她是我的朋友。
+【右侧】 [PERSON] + 是 + [MY/YOUR/HIS/HER] + 朋友
+【符号】 +
+【高亮】 是",,,Look at the pattern.,,,,PERSON + 是 + 我的/你的/他的/她的 + 朋友.,"Word: 朋友 / 我的
+Pattern: 她是我的朋友。"
+Phase 2 - Knowledge Discovery,"12 · PATTERN Discovery — ""是 + 的 + 朋友""",Discover sentence: 她是我的朋友,CMP-35 · 发音练习,"[顶标] Pronunciation practice
+【汉字】 她是我的朋友。
+【拼音】 Tā shì wǒ de péngyou.
+[英文] She is my friend.",,,Emma is my friend. Say it.,她是我的朋友。,Good.,Try again: 她是我的朋友。,Nice — you said it about Emma.,"Word: 朋友 / 我的
+Pattern: 她是我的朋友。"
+Phase 2 - Knowledge Discovery,"12 · PATTERN Discovery — ""是 + 的 + 朋友""__2",Discover sentence: 他是我的朋友,CMP-35 · 发音练习,"[顶标] Pronunciation practice
+【汉字】 他是我的朋友。
+【拼音】 Tā shì wǒ de péngyou.
+[英文] He is my friend.",,,Jayden is my friend. Say it.,他是我的朋友。,Good.,Try again: 他是我的朋友。,是。他是我的朋友。,"Word: 朋友 / 我的
+Pattern: 他是我的朋友。"
+Phase 2 - Knowledge Discovery,"12 · PATTERN Discovery — ""是 + 的 + 朋友""__3",Discover sentence: 他不是我的朋友,CMP-35 · 发音练习,"[顶标] Pronunciation practice
+【汉字】 不是。他不是我的朋友。
+【拼音】 Bú shì. Tā bú shì wǒ de péngyou.
+[英文] No. He is not my friend.",,,他是你的朋友吗？,Say no: 不是。他不是我的朋友。,Good. You can say yes. You can say no.,Try: 不是。他不是我的朋友。,You can say yes. You can say no.,"Word: 朋友 / 不是
+Pattern: 他不是我的朋友。"
+Phase 2 - Knowledge Discovery,13 · PRACTICE — COUNTRY + FRIEND,Discover use: name + country + friend,CMP-15 · 角色扮演对话,"[场景] International Chinese School. New students just arrived — help welcome them. First one together.
+[顶标] Role Play
+【Emma】 你好！
+【user】 请问，你叫什么名字？
+【Emma】 我叫 Emma。
+【user】 请问，你是哪国人？
+【Emma】 我是美国人。
+【user】 是。她是我的朋友。",,,Great! Now you know how to ask where someone is from. Let's go and meet your new friends. Can you help welcome them? Let's do the first one together.,Start by asking her name.,Excellent.,Try the line on the screen.,Emma smiles. You welcomed your first new friend.,"Word: 名字 / 哪国 / 朋友
+Pattern: 请问，你叫什么名字？ / 请问，你是哪国人？ / 她是我的朋友。"
+Phase 3 - Performance Mission,15 · MISSION Ready,Mission Ready,CMP-32 · 学习目标,"[页眉] Welcome to your Chinese lesson!
+[副标题] Today's topic: this mission
+[卡片标题] Mission goals
+【目标】 Ask where someone is from
+【目标】 Say where you are from
+【目标】 Talk about Chinese, American and British people
+【目标】 Say who your friend is
+【目标】 Ask if someone is your friend **Kai:** You know what to say. But do you understand the story now? Let's find out. ---",,,You know what to say. But do you understand the story now? Let's find out.,,,,Let's find out.,Word: 朋友 / 你的 / 中国 / 美国
+Phase 3 - Performance Mission,15 · MISSION Ready,Mission Ready,CMP-18 · AI Mission Setup,"【任务标题】 this mission
+[目标] Ask people if they are Kai.
+[目标] Ask people if they are Kai.
+[开始按钮] START MISSION",,,,But do you understand the story now?,Good — keep that in mind.,Not quite — try once more.,Let’s find out.,Word: 朋友 / 你的 / 中国 / 美国
+Phase 3 - Performance Mission,16 · THE WO HUI MOMENT — STORY REPLAY,Story Replay,CMP-03 · 视频播放,NA,,,Remember the story from the beginning? Watch again. No subtitles.,,,,Pause.,Word: 中国 / 朋友 / 哪国
+Phase 3 - Performance Mission,17 · REAL-WORLD PERFORMANCE MISSION — MEET FRIENDS FROM AROUND THE WORLD,Meet Friends,CMP-20 · 总结过渡页,"【按钮】 See what we've learned !
+[跳过] Skip for Now",,,--- AI Adaptive Journey Student chooses who to talk to first. No fixed order. Emma Student: 请问， 你叫什么名字？,,,,Learner drags Emma onto 🇺🇸 USA…,"Word: 哪国 / 美国 / 朋友 / 我的
+Pattern: 你是哪国人？"
+Phase 3 - Performance Mission,17 · REAL-WORLD PERFORMANCE MISSION — MEET FRIENDS FROM AROUND THE WORLD,Meet Friends,CMP-19 · AI开放任务对话,"【题目】 [待补: 小轮1英文说明]
+[答错] Not quite. Please try again.
+[句型] 是……吗？ shì ma
+[表达] 你是老师吗？ nǐ shì lǎo shī ma
+[词] Kai老师/你/您 Kai lǎo shī/nǐ/nín
+【标准句】 [待补: 标准句} {拼音]
+【参考答案】 [待补]
+[NPC回复] 不是，我不是老师，我是学生
+【题目】 [待补: 小轮2英文说明]
+[答错] Not quite. Please try again.
+[句型] 是……吗？ shì ma
+[表达] 你是老师吗？ nǐ shì lǎo shī ma
+[词] Kai老师/你/您 Kai lǎo shī/nǐ/nín
+【标准句】 [待补: 标准句} {拼音]",,,can you introduce our international class?,Your turn — try it.,Good — keep that in mind.,Not quite — try once more.,Let's keep going.,Word: 中国 / 美国 / 英国 / 朋友
+Phase 4 - Ending Summary,18 · Today You Can + Wo Hui Moment,Today You Can,CMP-20 · 总结过渡页,"【按钮】 See what we've learned !
+[跳过] Skip for Now",,,Let's begin.,,,,Let's keep going.,SocialExpression: classroom rapport
+Phase 4 - Ending Summary,19 · Key Takeaways,Key takeaways,CMP-21 · 关键表达回顾-句,"[标题] Key Takeaways
+【句】 [待补: 条目]
+…",,,Key takeaways 你是哪国人 ？ 我是英国人。 她是美国人。,,,,他的朋友也是中国人。,"Word: 哪国 / 中国 / 美国 / 英国
+Pattern: 你是哪国人？"

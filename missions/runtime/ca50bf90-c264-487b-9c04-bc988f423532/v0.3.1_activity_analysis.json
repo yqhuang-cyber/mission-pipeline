@@ -1,0 +1,1831 @@
+{
+  "version": "v0.3.1",
+  "missionName": "Mission 4-8",
+  "steps": [
+    {
+      "phase": "P1",
+      "scriptStep": 1,
+      "name": "MISSION ENTRY — Warm Up",
+      "purpose": "建立关系、激活注意、明确任务",
+      "activities": [
+        {
+          "id": "1.1",
+          "title": "课前欢迎与导入",
+          "intent": "【课前欢迎与导入】服务教学目的「建立关系、激活注意、明确任务」",
+          "sourceAnchor": "**Kai:** Welcome back. Last mission, you learnt how to find the right person. 你是 王 老师吗？ Today, you'll meet friends from different countries. **Screen:**",
+          "candidates": [
+            {
+              "id": "CMP-01",
+              "nameZh": "课前寒暄",
+              "rationale": "匹配「开场寒暄」",
+              "recommended": true,
+              "fromN1": true
+            },
+            {
+              "id": "CMP-32",
+              "nameZh": "学习目标",
+              "rationale": "N1 建议 component",
+              "recommended": false,
+              "fromN1": true
+            },
+            {
+              "id": "CMP-04",
+              "nameZh": "Mission发布",
+              "rationale": "N1 建议 component",
+              "recommended": false,
+              "fromN1": true
+            },
+            {
+              "id": "CMP-02",
+              "nameZh": "互动选择",
+              "rationale": "模版可承载文字",
+              "recommended": false
+            },
+            {
+              "id": "CMP-05",
+              "nameZh": "视频文字讲解",
+              "rationale": "模版可承载文字",
+              "recommended": false
+            }
+          ],
+          "selectedComponentId": "CMP-01"
+        },
+        {
+          "id": "1.2",
+          "title": "发布 Mission 与学习目标",
+          "intent": "【发布 Mission 与学习目标】服务教学目的「建立关系、激活注意、明确任务」",
+          "sourceAnchor": "YOUR MISSION Meeting Friends from Around the World By the end of this mission, you can: ✓ Ask where someone is from ✓ Say where you are from ✓ Talk about Chinese, American and British people ✓ Say who your friend is ✓ Ask if someone is your friend **Kai:** Ready to meet friends from around the world? START MISSION ---",
+          "candidates": [
+            {
+              "id": "CMP-04",
+              "nameZh": "Mission发布",
+              "rationale": "匹配「Mission / Goals」",
+              "recommended": true,
+              "fromN1": true
+            },
+            {
+              "id": "CMP-32",
+              "nameZh": "学习目标",
+              "rationale": "匹配「Mission / Goals」",
+              "recommended": false,
+              "fromN1": true
+            },
+            {
+              "id": "CMP-01",
+              "nameZh": "课前寒暄",
+              "rationale": "N1 建议 component",
+              "recommended": false,
+              "fromN1": true
+            },
+            {
+              "id": "CMP-02",
+              "nameZh": "互动选择",
+              "rationale": "模版可承载文字",
+              "recommended": false
+            },
+            {
+              "id": "CMP-05",
+              "nameZh": "视频文字讲解",
+              "rationale": "模版可承载文字",
+              "recommended": false
+            }
+          ],
+          "selectedComponentId": "CMP-04"
+        }
+      ]
+    },
+    {
+      "phase": "P1",
+      "scriptStep": 2,
+      "name": "OPENING STORY — Experience First",
+      "purpose": "首次沉浸式故事体验，感知目标语言现象",
+      "activities": [
+        {
+          "id": "2.1",
+          "title": "观看开场故事",
+          "intent": "【观看开场故事】服务教学目的「首次沉浸式故事体验，感知目标语言现象」",
+          "sourceAnchor": "**Kai:** First, watch. Don't try to understand every word. Just notice: Where is everyone from? Who is whose friend? **Video plays.** **Mission 4: opening story** 王老师走过来。 王老师： 大家好！ 学生们： 老师好！ 王老师看向 Tom。 王老师： 请问，你叫什么名字？ Tom： 我叫 Tom。 王老师： 你是哪国人？ Tom： 我是英国人。 王老师看向 Emma。 王老师： 她是你的朋友吗？ Tom： 是。她是我的朋友。 王老师： 她是哪国人？ Tom： 她是美国人。…",
+          "candidates": [
+            {
+              "id": "CMP-03",
+              "nameZh": "视频播放",
+              "rationale": "匹配「观看 / 故事」",
+              "recommended": true,
+              "fromN1": true
+            },
+            {
+              "id": "CMP-05",
+              "nameZh": "视频文字讲解",
+              "rationale": "匹配「观看 / 故事」",
+              "recommended": false
+            },
+            {
+              "id": "CMP-33",
+              "nameZh": "选择题（传统版）",
+              "rationale": "N1 建议 component",
+              "recommended": false,
+              "fromN1": true
+            },
+            {
+              "id": "CMP-23",
+              "nameZh": "半屏大图",
+              "rationale": "匹配「观看 / 故事」",
+              "recommended": false
+            },
+            {
+              "id": "CMP-02",
+              "nameZh": "互动选择",
+              "rationale": "模版可承载文字",
+              "recommended": false
+            }
+          ],
+          "selectedComponentId": "CMP-03"
+        },
+        {
+          "id": "2.2",
+          "title": "观后理解检测",
+          "intent": "【观后理解检测】服务教学目的「首次沉浸式故事体验，感知目标语言现象」",
+          "sourceAnchor": "How many countries did you hear? **Student choices:** A 1 B 2 C 3 Where is Tom come from? **Kai:** Keep the story in mind. We'll come back to it. ---",
+          "candidates": [
+            {
+              "id": "CMP-33",
+              "nameZh": "选择题（传统版）",
+              "rationale": "适合：模版含选项/答案，匹配听辨或含义推断",
+              "recommended": true,
+              "fromN1": true
+            },
+            {
+              "id": "CMP-13",
+              "nameZh": "单项选择",
+              "rationale": "适合：模版含选项/答案，匹配听辨或含义推断",
+              "recommended": false
+            },
+            {
+              "id": "CMP-02",
+              "nameZh": "互动选择",
+              "rationale": "适合：模版含选项/答案，匹配听辨或含义推断",
+              "recommended": false
+            },
+            {
+              "id": "CMP-03",
+              "nameZh": "视频播放",
+              "rationale": "匹配「观看 / 故事」",
+              "recommended": false,
+              "fromN1": true
+            },
+            {
+              "id": "CMP-12",
+              "nameZh": "词块造句",
+              "rationale": "适合：模版含选项/答案，匹配听辨或含义推断",
+              "recommended": false
+            }
+          ],
+          "selectedComponentId": "CMP-33"
+        }
+      ]
+    },
+    {
+      "phase": "P2",
+      "scriptStep": 3,
+      "name": "CONTEXT STORY — WHERE ARE YOU FROM?",
+      "purpose": "通过语境理解核心问句\"你是哪国人？\"",
+      "activities": [
+        {
+          "id": "3.1",
+          "title": "观看开场故事",
+          "intent": "【观看开场故事】服务教学目的「通过语境理解核心问句\"你是哪国人？\"」",
+          "sourceAnchor": "**Kai:** First, watch. Don't try to understand every word. Just notice: Where is everyone from? Who is whose friend? **Video plays.** **Mission 4: opening story** 王老师走过来。 王老师： 大家好！ 学生们： 老师好！ 王老师看向 Tom。 王老师： 请问，你叫什么名字？ Tom： 我叫 Tom。 王老师： 你是哪国人？ Tom： 我是英国人。 王老师看向 Emma。 王老师： 她是你的朋友吗？ Tom： 是。她是我的朋友。 王老师： 她是哪国人？ Tom： 她是美国人。…",
+          "candidates": [
+            {
+              "id": "CMP-03",
+              "nameZh": "视频播放",
+              "rationale": "匹配「观看 / 故事」",
+              "recommended": true,
+              "fromN1": true
+            },
+            {
+              "id": "CMP-05",
+              "nameZh": "视频文字讲解",
+              "rationale": "匹配「观看 / 故事」",
+              "recommended": false
+            },
+            {
+              "id": "CMP-13",
+              "nameZh": "单项选择",
+              "rationale": "N1 建议 component",
+              "recommended": false,
+              "fromN1": true
+            },
+            {
+              "id": "CMP-23",
+              "nameZh": "半屏大图",
+              "rationale": "匹配「观看 / 故事」",
+              "recommended": false
+            },
+            {
+              "id": "CMP-09",
+              "nameZh": "全屏大图",
+              "rationale": "N1 建议 component",
+              "recommended": false,
+              "fromN1": true
+            }
+          ],
+          "selectedComponentId": "CMP-03"
+        },
+        {
+          "id": "3.2",
+          "title": "观后理解检测",
+          "intent": "【观后理解检测】服务教学目的「通过语境理解核心问句\"你是哪国人？\"」",
+          "sourceAnchor": "How many countries did you hear? **Student choices:** A 1 B 2 C 3 Where is Tom come from? **Kai:** Keep the story in mind. We'll come back to it. ---",
+          "candidates": [
+            {
+              "id": "CMP-13",
+              "nameZh": "单项选择",
+              "rationale": "适合：模版含选项/答案，匹配听辨或含义推断",
+              "recommended": true,
+              "fromN1": true
+            },
+            {
+              "id": "CMP-33",
+              "nameZh": "选择题（传统版）",
+              "rationale": "适合：模版含选项/答案，匹配听辨或含义推断",
+              "recommended": false
+            },
+            {
+              "id": "CMP-02",
+              "nameZh": "互动选择",
+              "rationale": "适合：模版含选项/答案，匹配听辨或含义推断",
+              "recommended": false
+            },
+            {
+              "id": "CMP-12",
+              "nameZh": "词块造句",
+              "rationale": "适合：模版含选项/答案，匹配听辨或含义推断",
+              "recommended": false
+            },
+            {
+              "id": "CMP-14",
+              "nameZh": "句型变换",
+              "rationale": "适合：模版含选项/答案，匹配听辨或含义推断",
+              "recommended": false
+            }
+          ],
+          "selectedComponentId": "CMP-13"
+        }
+      ]
+    },
+    {
+      "phase": "P2",
+      "scriptStep": 4,
+      "name": "CONNECT TO WHAT I KNOW — NAME QUESTION VS COUNTRY QUESTION",
+      "purpose": "关联已学知识，对比姓名问句与国籍问句",
+      "activities": [
+        {
+          "id": "4.1",
+          "title": "对比已学问句",
+          "intent": "【对比已学问句】服务教学目的「关联已学知识，对比姓名问句与国籍问句」",
+          "sourceAnchor": "**Screen:** 你叫什么名字？ 你是哪国人？ **Kai:** You already know how to ask someone's name. 你叫什么名字？ Now you can ask where someone is from. 你是哪国人？ **Kai:** Two questions. Both help you get to know someone.",
+          "candidates": [
+            {
+              "id": "CMP-11",
+              "nameZh": "句型观察",
+              "rationale": "适合：模版有 3 个【例句】槽，可并排呈现「你叫什么名字？」与「你是哪国人？」供观察对比；目的「通过对比自主发现结构」",
+              "recommended": true,
+              "fromN1": true
+            },
+            {
+              "id": "CMP-07",
+              "nameZh": "句型学习",
+              "rationale": "适合：左右例句+公式支架，可对照「你叫什么名字？」与「你是哪国人？」并点出结构差异",
+              "recommended": false
+            },
+            {
+              "id": "CMP-10",
+              "nameZh": "图文卡片",
+              "rationale": "可用：图文卡可承载对比文案，但原型偏单点聚焦，两句并排略勉强",
+              "recommended": false
+            },
+            {
+              "id": "CMP-16",
+              "nameZh": "图文介绍",
+              "rationale": "可用：图文卡可承载对比文案，但原型偏单点聚焦，两句并排略勉强",
+              "recommended": false
+            },
+            {
+              "id": "CMP-04",
+              "nameZh": "Mission发布",
+              "rationale": "模版可承载文字",
+              "recommended": false
+            }
+          ],
+          "selectedComponentId": "CMP-11",
+          "selectionThinking": "选型思考：本活动要展示并对比「你叫什么名字？」与「你是哪国人？」，让学生观察差异，不是先做选择题。 因此优先模版能挂多句的组件（句型观察/句型学习/图文卡），下调单项选择。 推荐顺序：CMP-11 句型观察 → CMP-07 句型学习 → CMP-10 图文卡片"
+        },
+        {
+          "id": "4.2",
+          "title": "听辨练习：问名字",
+          "intent": "【听辨练习：问名字】服务教学目的「关联已学知识，对比姓名问句与国籍问句」",
+          "sourceAnchor": "Listen and choose. ** Kai asks:** 你叫什么名字？ **Choices:** A. Name B. Country **Student chooses:** Name **",
+          "candidates": [
+            {
+              "id": "CMP-02",
+              "nameZh": "互动选择",
+              "rationale": "适合：模版含选项/答案，匹配听辨或含义推断",
+              "recommended": true,
+              "fromN1": true
+            },
+            {
+              "id": "CMP-13",
+              "nameZh": "单项选择",
+              "rationale": "适合：模版含选项/答案，匹配听辨或含义推断",
+              "recommended": false
+            },
+            {
+              "id": "CMP-33",
+              "nameZh": "选择题（传统版）",
+              "rationale": "适合：模版含选项/答案，匹配听辨或含义推断",
+              "recommended": false
+            },
+            {
+              "id": "CMP-12",
+              "nameZh": "词块造句",
+              "rationale": "适合：模版含选项/答案，匹配听辨或含义推断",
+              "recommended": false
+            },
+            {
+              "id": "CMP-14",
+              "nameZh": "句型变换",
+              "rationale": "适合：模版含选项/答案，匹配听辨或含义推断",
+              "recommended": false
+            }
+          ],
+          "selectedComponentId": "CMP-02"
+        },
+        {
+          "id": "4.3",
+          "title": "听辨练习：问国籍",
+          "intent": "【听辨练习：问国籍】服务教学目的「关联已学知识，对比姓名问句与国籍问句」",
+          "sourceAnchor": "Listen and choose. Kai asks:** 你是哪国人？ **Choices:** A. Name B. Country **Student chooses:** Country **Kai:** 好！ One question finds out a name. One question finds out where someone is from. ---",
+          "candidates": [
+            {
+              "id": "CMP-02",
+              "nameZh": "互动选择",
+              "rationale": "适合：模版含选项/答案，匹配听辨或含义推断",
+              "recommended": true,
+              "fromN1": true
+            },
+            {
+              "id": "CMP-13",
+              "nameZh": "单项选择",
+              "rationale": "适合：模版含选项/答案，匹配听辨或含义推断",
+              "recommended": false
+            },
+            {
+              "id": "CMP-33",
+              "nameZh": "选择题（传统版）",
+              "rationale": "适合：模版含选项/答案，匹配听辨或含义推断",
+              "recommended": false
+            },
+            {
+              "id": "CMP-12",
+              "nameZh": "词块造句",
+              "rationale": "适合：模版含选项/答案，匹配听辨或含义推断",
+              "recommended": false
+            },
+            {
+              "id": "CMP-14",
+              "nameZh": "句型变换",
+              "rationale": "适合：模版含选项/答案，匹配听辨或含义推断",
+              "recommended": false
+            }
+          ],
+          "selectedComponentId": "CMP-02"
+        }
+      ]
+    },
+    {
+      "phase": "P2",
+      "scriptStep": 5,
+      "name": "DISCOVERY — COUNTRY + 人",
+      "purpose": "发现\"国家+人\"构成国民表达的词汇模式",
+      "activities": [
+        {
+          "id": "5.1",
+          "title": "情境回放聚焦目标知识点",
+          "intent": "【情境回放聚焦目标知识点】服务教学目的「发现\"国家+人\"构成国民表达的词汇模式」",
+          "sourceAnchor": "** Replay.** Tom： 我是英国人。 **Freeze.** **Kai:** Tom is from the UK. Listen. ** ** Then replay Emma. Tom： 她是美国人。 ** Then Jayden. Emma： 他是中国人。 ** **",
+          "candidates": [
+            {
+              "id": "CMP-03",
+              "nameZh": "视频播放",
+              "rationale": "活动类型：情境回放",
+              "recommended": true,
+              "fromN1": true
+            },
+            {
+              "id": "CMP-05",
+              "nameZh": "视频文字讲解",
+              "rationale": "活动类型：情境回放",
+              "recommended": false
+            },
+            {
+              "id": "CMP-08",
+              "nameZh": "听音跟读",
+              "rationale": "匹配「听音跟读」",
+              "recommended": false
+            },
+            {
+              "id": "CMP-29",
+              "nameZh": "词汇学习",
+              "rationale": "匹配「词汇」",
+              "recommended": false
+            },
+            {
+              "id": "CMP-10",
+              "nameZh": "图文卡片",
+              "rationale": "匹配「词汇」",
+              "recommended": false
+            }
+          ],
+          "selectedComponentId": "CMP-03"
+        },
+        {
+          "id": "5.2",
+          "title": "聚焦知识点「英国人」",
+          "intent": "【聚焦知识点「英国人」】服务教学目的「发现\"国家+人\"构成国民表达的词汇模式」",
+          "sourceAnchor": "我是英国人。 Audio:** 英国人。 Screen shows UK flag / map.** 英国人",
+          "candidates": [
+            {
+              "id": "CMP-10",
+              "nameZh": "图文卡片",
+              "rationale": "匹配「图片 / 图文」",
+              "recommended": true
+            },
+            {
+              "id": "CMP-29",
+              "nameZh": "词汇学习",
+              "rationale": "匹配「词汇」",
+              "recommended": false
+            },
+            {
+              "id": "CMP-09",
+              "nameZh": "全屏大图",
+              "rationale": "匹配「图片 / 图文」",
+              "recommended": false
+            },
+            {
+              "id": "CMP-11",
+              "nameZh": "句型观察",
+              "rationale": "适合：利于多例对照发现规律（通过对比自主发现结构）",
+              "recommended": false,
+              "fromN1": true
+            },
+            {
+              "id": "CMP-07",
+              "nameZh": "句型学习",
+              "rationale": "适合：利于多例对照发现规律（提供必要支架帮助理解句型规律）",
+              "recommended": false
+            }
+          ],
+          "selectedComponentId": "CMP-10"
+        },
+        {
+          "id": "5.3",
+          "title": "聚焦知识点「美国人」",
+          "intent": "【聚焦知识点「美国人」】服务教学目的「发现\"国家+人\"构成国民表达的词汇模式」",
+          "sourceAnchor": "她是美国人。 Screen shows US flag / map.** 美国人",
+          "candidates": [
+            {
+              "id": "CMP-10",
+              "nameZh": "图文卡片",
+              "rationale": "匹配「图片 / 图文」",
+              "recommended": true
+            },
+            {
+              "id": "CMP-29",
+              "nameZh": "词汇学习",
+              "rationale": "匹配「词汇」",
+              "recommended": false
+            },
+            {
+              "id": "CMP-09",
+              "nameZh": "全屏大图",
+              "rationale": "匹配「图片 / 图文」",
+              "recommended": false
+            },
+            {
+              "id": "CMP-11",
+              "nameZh": "句型观察",
+              "rationale": "适合：利于多例对照发现规律（通过对比自主发现结构）",
+              "recommended": false,
+              "fromN1": true
+            },
+            {
+              "id": "CMP-07",
+              "nameZh": "句型学习",
+              "rationale": "适合：利于多例对照发现规律（提供必要支架帮助理解句型规律）",
+              "recommended": false
+            }
+          ],
+          "selectedComponentId": "CMP-10"
+        },
+        {
+          "id": "5.4",
+          "title": "聚焦知识点「中国人」",
+          "intent": "【聚焦知识点「中国人」】服务教学目的「发现\"国家+人\"构成国民表达的词汇模式」",
+          "sourceAnchor": "他是中国人。 Screen shows China flag / map.** 中国人 Screen:** 英国人 美国人 中国人 **Kai:**",
+          "candidates": [
+            {
+              "id": "CMP-10",
+              "nameZh": "图文卡片",
+              "rationale": "匹配「图片 / 图文」",
+              "recommended": true
+            },
+            {
+              "id": "CMP-29",
+              "nameZh": "词汇学习",
+              "rationale": "匹配「词汇」",
+              "recommended": false
+            },
+            {
+              "id": "CMP-09",
+              "nameZh": "全屏大图",
+              "rationale": "匹配「图片 / 图文」",
+              "recommended": false
+            },
+            {
+              "id": "CMP-11",
+              "nameZh": "句型观察",
+              "rationale": "适合：利于多例对照发现规律（通过对比自主发现结构）",
+              "recommended": false,
+              "fromN1": true
+            },
+            {
+              "id": "CMP-07",
+              "nameZh": "句型学习",
+              "rationale": "适合：利于多例对照发现规律（提供必要支架帮助理解句型规律）",
+              "recommended": false
+            }
+          ],
+          "selectedComponentId": "CMP-10"
+        },
+        {
+          "id": "5.5",
+          "title": "发现构词规律",
+          "intent": "【发现构词规律】服务教学目的「发现\"国家+人\"构成国民表达的词汇模式」",
+          "sourceAnchor": "What do you notice? **Student taps** 人. **Kai:** Exactly. The same character appears every time. **Highlight:** 人 **Kai:** What do you think 人 is doing here? **Choices:** A. Asking a question B. Talking about a person from that country C. Saying goodbye **Student chooses B.** **Kai:** Exactly. 😄",
+          "candidates": [
+            {
+              "id": "CMP-11",
+              "nameZh": "句型观察",
+              "rationale": "适合：利于多例对照发现规律（通过对比自主发现结构）",
+              "recommended": true,
+              "fromN1": true
+            },
+            {
+              "id": "CMP-13",
+              "nameZh": "单项选择",
+              "rationale": "匹配「选择题」",
+              "recommended": false,
+              "fromN1": true
+            },
+            {
+              "id": "CMP-29",
+              "nameZh": "词汇学习",
+              "rationale": "匹配「词汇」",
+              "recommended": false
+            },
+            {
+              "id": "CMP-07",
+              "nameZh": "句型学习",
+              "rationale": "适合：利于多例对照发现规律（提供必要支架帮助理解句型规律）",
+              "recommended": false
+            },
+            {
+              "id": "CMP-33",
+              "nameZh": "选择题（传统版）",
+              "rationale": "匹配「选择题」",
+              "recommended": false
+            }
+          ],
+          "selectedComponentId": "CMP-13"
+        },
+        {
+          "id": "5.6",
+          "title": "句型规律识别",
+          "intent": "【句型规律识别】服务教学目的「发现\"国家+人\"构成国民表达的词汇模式」",
+          "sourceAnchor": "**Screen:** 中国 + 人 → 中国人 美国 + 人 → 美国人 英国 + 人 → 英国人 **Kai:** Country + 人. A person from that country. ---",
+          "candidates": [
+            {
+              "id": "CMP-11",
+              "nameZh": "句型观察",
+              "rationale": "活动类型：句型规律呈现",
+              "recommended": true,
+              "fromN1": true
+            },
+            {
+              "id": "CMP-10",
+              "nameZh": "图文卡片",
+              "rationale": "匹配「词汇」",
+              "recommended": false
+            },
+            {
+              "id": "CMP-07",
+              "nameZh": "句型学习",
+              "rationale": "活动类型：句型规律呈现",
+              "recommended": false
+            },
+            {
+              "id": "CMP-29",
+              "nameZh": "词汇学习",
+              "rationale": "匹配「词汇」",
+              "recommended": false
+            },
+            {
+              "id": "CMP-13",
+              "nameZh": "单项选择",
+              "rationale": "N1 建议 component",
+              "recommended": false,
+              "fromN1": true
+            }
+          ],
+          "selectedComponentId": "CMP-11"
+        }
+      ]
+    },
+    {
+      "phase": "P2",
+      "scriptStep": 6,
+      "name": "PRACTICE — BUILD THE COUNTRY WORDS",
+      "purpose": "练习构建\"国家+人\"表达式",
+      "activities": [
+        {
+          "id": "6.1",
+          "title": "构建「中国人」",
+          "intent": "【构建「中国人」】服务教学目的「练习构建\"国家+人\"表达式」",
+          "sourceAnchor": "Kai: Let's try. Screen shows China. Student builds: 中国 + 人 Student says: 中国人 Kai: 中国人。",
+          "candidates": [
+            {
+              "id": "CMP-12",
+              "nameZh": "词块造句",
+              "rationale": "活动类型：词块造句",
+              "recommended": true,
+              "fromN1": true
+            },
+            {
+              "id": "CMP-07",
+              "nameZh": "句型学习",
+              "rationale": "活动类型：句型学习备选",
+              "recommended": false,
+              "fromN1": true
+            },
+            {
+              "id": "CMP-35",
+              "nameZh": "发音练习",
+              "rationale": "N1 建议 component",
+              "recommended": false,
+              "fromN1": true
+            },
+            {
+              "id": "CMP-02",
+              "nameZh": "互动选择",
+              "rationale": "模版可承载文字",
+              "recommended": false
+            },
+            {
+              "id": "CMP-04",
+              "nameZh": "Mission发布",
+              "rationale": "模版可承载文字",
+              "recommended": false
+            }
+          ],
+          "selectedComponentId": "CMP-12"
+        },
+        {
+          "id": "6.2",
+          "title": "构建「美国人」",
+          "intent": "【构建「美国人」】服务教学目的「练习构建\"国家+人\"表达式」",
+          "sourceAnchor": "Screen shows America. Student builds: 美国 + 人 Student says: 美国人 Kai: 美国人。",
+          "candidates": [
+            {
+              "id": "CMP-12",
+              "nameZh": "词块造句",
+              "rationale": "活动类型：词块造句",
+              "recommended": true,
+              "fromN1": true
+            },
+            {
+              "id": "CMP-07",
+              "nameZh": "句型学习",
+              "rationale": "活动类型：句型学习备选",
+              "recommended": false,
+              "fromN1": true
+            },
+            {
+              "id": "CMP-35",
+              "nameZh": "发音练习",
+              "rationale": "N1 建议 component",
+              "recommended": false,
+              "fromN1": true
+            },
+            {
+              "id": "CMP-02",
+              "nameZh": "互动选择",
+              "rationale": "模版可承载文字",
+              "recommended": false
+            },
+            {
+              "id": "CMP-04",
+              "nameZh": "Mission发布",
+              "rationale": "模版可承载文字",
+              "recommended": false
+            }
+          ],
+          "selectedComponentId": "CMP-12"
+        },
+        {
+          "id": "6.3",
+          "title": "构建「英国人」",
+          "intent": "【构建「英国人」】服务教学目的「练习构建\"国家+人\"表达式」",
+          "sourceAnchor": "Screen shows UK. Student builds: 英国 + 人 Student says: 英国人 Kai: 英国人。 Kai: You found the pattern. Now use it. ---",
+          "candidates": [
+            {
+              "id": "CMP-12",
+              "nameZh": "词块造句",
+              "rationale": "活动类型：词块造句",
+              "recommended": true,
+              "fromN1": true
+            },
+            {
+              "id": "CMP-07",
+              "nameZh": "句型学习",
+              "rationale": "匹配「句型观察/对比」",
+              "recommended": false,
+              "fromN1": true
+            },
+            {
+              "id": "CMP-11",
+              "nameZh": "句型观察",
+              "rationale": "匹配「句型观察/对比」",
+              "recommended": false
+            },
+            {
+              "id": "CMP-10",
+              "nameZh": "图文卡片",
+              "rationale": "匹配「句型观察/对比」",
+              "recommended": false
+            },
+            {
+              "id": "CMP-35",
+              "nameZh": "发音练习",
+              "rationale": "N1 建议 component",
+              "recommended": false,
+              "fromN1": true
+            }
+          ],
+          "selectedComponentId": "CMP-12"
+        }
+      ]
+    },
+    {
+      "phase": "P2",
+      "scriptStep": 7,
+      "name": "USE BEFORE MEMORY — WHERE ARE YOU FROM?",
+      "purpose": "在真实语境中运用\"我是___人\"表达国籍",
+      "activities": [
+        {
+          "id": "7.1",
+          "title": "对话练习：说出自己的国籍",
+          "intent": "【对话练习：说出自己的国籍】服务教学目的「在真实语境中运用\"我是___人\"表达国籍」",
+          "sourceAnchor": "**Kai asks student:** 我是英国人。 请问，你是哪国人？ **Student answers based on profile / choice:** 我是中国人。 or 我是英国人。 or 我是美国人。 **Kai:** Got it. 😄 我是____人。我是中国人。 You just said where you are from in Chinese.",
+          "candidates": [
+            {
+              "id": "CMP-15",
+              "nameZh": "角色扮演对话",
+              "rationale": "匹配「对话 / 表演」",
+              "recommended": true,
+              "fromN1": true
+            },
+            {
+              "id": "CMP-19",
+              "nameZh": "AI开放任务对话",
+              "rationale": "匹配「对话 / 表演」",
+              "recommended": false
+            },
+            {
+              "id": "CMP-24",
+              "nameZh": "单轮情境口语作答",
+              "rationale": "活动类型：自我介绍口语",
+              "recommended": false
+            },
+            {
+              "id": "CMP-35",
+              "nameZh": "发音练习",
+              "rationale": "N1 建议 component",
+              "recommended": false,
+              "fromN1": true
+            },
+            {
+              "id": "CMP-02",
+              "nameZh": "互动选择",
+              "rationale": "模版可承载文字",
+              "recommended": false
+            }
+          ],
+          "selectedComponentId": "CMP-15"
+        },
+        {
+          "id": "7.2",
+          "title": "指人说「他是英国人」",
+          "intent": "【指人说「他是英国人」】服务教学目的「在真实语境中运用\"我是___人\"表达国籍」",
+          "sourceAnchor": "Kai shows Tom. **Kai:** Tom is from the UK. Say it. **Student:** 他是英国人。 **",
+          "candidates": [
+            {
+              "id": "CMP-24",
+              "nameZh": "单轮情境口语作答",
+              "rationale": "适合：单轮情境口语，匹配「看提示→说出目标句」",
+              "recommended": true
+            },
+            {
+              "id": "CMP-25",
+              "nameZh": "快速视觉口语识别",
+              "rationale": "可用：视觉线索促说，但模版偏选择/快答",
+              "recommended": false
+            },
+            {
+              "id": "CMP-35",
+              "nameZh": "发音练习",
+              "rationale": "可用：可练目标句发音，但弱化意义→形式产出",
+              "recommended": false,
+              "fromN1": true
+            },
+            {
+              "id": "CMP-15",
+              "nameZh": "角色扮演对话",
+              "rationale": "N1 建议 component",
+              "recommended": false,
+              "fromN1": true
+            },
+            {
+              "id": "CMP-02",
+              "nameZh": "互动选择",
+              "rationale": "模版可承载文字",
+              "recommended": false
+            }
+          ],
+          "selectedComponentId": "CMP-24"
+        },
+        {
+          "id": "7.3",
+          "title": "指人说「她是美国人」",
+          "intent": "【指人说「她是美国人」】服务教学目的「在真实语境中运用\"我是___人\"表达国籍」",
+          "sourceAnchor": "Kai shows Emma.** **Kai:** Emma is from America. **Student:** 她是美国人。 **",
+          "candidates": [
+            {
+              "id": "CMP-24",
+              "nameZh": "单轮情境口语作答",
+              "rationale": "适合：单轮情境口语，匹配「看提示→说出目标句」",
+              "recommended": true
+            },
+            {
+              "id": "CMP-25",
+              "nameZh": "快速视觉口语识别",
+              "rationale": "可用：视觉线索促说，但模版偏选择/快答",
+              "recommended": false
+            },
+            {
+              "id": "CMP-35",
+              "nameZh": "发音练习",
+              "rationale": "可用：可练目标句发音，但弱化意义→形式产出",
+              "recommended": false,
+              "fromN1": true
+            },
+            {
+              "id": "CMP-15",
+              "nameZh": "角色扮演对话",
+              "rationale": "N1 建议 component",
+              "recommended": false,
+              "fromN1": true
+            },
+            {
+              "id": "CMP-02",
+              "nameZh": "互动选择",
+              "rationale": "模版可承载文字",
+              "recommended": false
+            }
+          ],
+          "selectedComponentId": "CMP-24"
+        },
+        {
+          "id": "7.4",
+          "title": "指人说「她也是美国人」",
+          "intent": "【指人说「她也是美国人」】服务教学目的「在真实语境中运用\"我是___人\"表达国籍」",
+          "sourceAnchor": "Kai shows Anna.** Kai: Anna is also from America **Student:** 她也是美国人 **",
+          "candidates": [
+            {
+              "id": "CMP-24",
+              "nameZh": "单轮情境口语作答",
+              "rationale": "适合：单轮情境口语，匹配「看提示→说出目标句」",
+              "recommended": true
+            },
+            {
+              "id": "CMP-25",
+              "nameZh": "快速视觉口语识别",
+              "rationale": "可用：视觉线索促说，但模版偏选择/快答",
+              "recommended": false
+            },
+            {
+              "id": "CMP-35",
+              "nameZh": "发音练习",
+              "rationale": "可用：可练目标句发音，但弱化意义→形式产出",
+              "recommended": false,
+              "fromN1": true
+            },
+            {
+              "id": "CMP-15",
+              "nameZh": "角色扮演对话",
+              "rationale": "N1 建议 component",
+              "recommended": false,
+              "fromN1": true
+            },
+            {
+              "id": "CMP-02",
+              "nameZh": "互动选择",
+              "rationale": "模版可承载文字",
+              "recommended": false
+            }
+          ],
+          "selectedComponentId": "CMP-24"
+        },
+        {
+          "id": "7.5",
+          "title": "指人说「他是中国人」",
+          "intent": "【指人说「他是中国人」】服务教学目的「在真实语境中运用\"我是___人\"表达国籍」",
+          "sourceAnchor": "Kai shows Jayden.** **Kai:** Jayden is from China. **Student:** 他是中国人。 **Kai:** 好！ You can now talk about where other people are from too. ---",
+          "candidates": [
+            {
+              "id": "CMP-24",
+              "nameZh": "单轮情境口语作答",
+              "rationale": "适合：单轮情境口语，匹配「看提示→说出目标句」",
+              "recommended": true
+            },
+            {
+              "id": "CMP-25",
+              "nameZh": "快速视觉口语识别",
+              "rationale": "可用：视觉线索促说，但模版偏选择/快答",
+              "recommended": false
+            },
+            {
+              "id": "CMP-35",
+              "nameZh": "发音练习",
+              "rationale": "可用：可练目标句发音，但弱化意义→形式产出",
+              "recommended": false,
+              "fromN1": true
+            },
+            {
+              "id": "CMP-15",
+              "nameZh": "角色扮演对话",
+              "rationale": "N1 建议 component",
+              "recommended": false,
+              "fromN1": true
+            },
+            {
+              "id": "CMP-02",
+              "nameZh": "互动选择",
+              "rationale": "模版可承载文字",
+              "recommended": false
+            }
+          ],
+          "selectedComponentId": "CMP-24"
+        }
+      ]
+    },
+    {
+      "phase": "P2",
+      "scriptStep": 8,
+      "name": "DISCOVERY — ASK ABOUT HIM / HER",
+      "purpose": "发现\"他/她+哪国人\"构成询问他人国籍的句型",
+      "activities": [
+        {
+          "id": "8.1",
+          "title": "迁移：用他/她问国籍",
+          "intent": "【迁移：用他/她问国籍】服务教学目的「发现\"他/她+哪国人\"构成询问他人国籍的句型」",
+          "sourceAnchor": "**Screen:** 你是哪国人？ **Kai shows Tom.** **Kai:** You can ask you. But what if we ask about him? **Screen:** 他是___？ **Choices:** A. 他是哪国人？ B. 他叫什么名字？ C. 他是老师吗？ **Student selects:** 他是哪国人？ **Kai:** Exactly. 他是哪国人？ Then show Emma. **Kai:** Now ask about her. **",
+          "candidates": [
+            {
+              "id": "CMP-13",
+              "nameZh": "单项选择",
+              "rationale": "匹配「选择题」",
+              "recommended": true,
+              "fromN1": true
+            },
+            {
+              "id": "CMP-15",
+              "nameZh": "角色扮演对话",
+              "rationale": "活动类型：对话",
+              "recommended": false
+            },
+            {
+              "id": "CMP-19",
+              "nameZh": "AI开放任务对话",
+              "rationale": "活动类型：对话",
+              "recommended": false
+            },
+            {
+              "id": "CMP-33",
+              "nameZh": "选择题（传统版）",
+              "rationale": "匹配「选择题」",
+              "recommended": false
+            },
+            {
+              "id": "CMP-02",
+              "nameZh": "互动选择",
+              "rationale": "匹配「选择题」",
+              "recommended": false
+            }
+          ],
+          "selectedComponentId": "CMP-13"
+        },
+        {
+          "id": "8.2",
+          "title": "词块造句 / 句型建构",
+          "intent": "【词块造句 / 句型建构】服务教学目的「发现\"他/她+哪国人\"构成询问他人国籍的句型」",
+          "sourceAnchor": "Student builds:** 她是哪国人？ **Kai:** Perfect. You already knew 他 and 她. Now you can use them in a new question. ---",
+          "candidates": [
+            {
+              "id": "CMP-12",
+              "nameZh": "词块造句",
+              "rationale": "匹配「词块造句」",
+              "recommended": true,
+              "fromN1": true
+            },
+            {
+              "id": "CMP-07",
+              "nameZh": "句型学习",
+              "rationale": "活动类型：句型学习备选",
+              "recommended": false
+            },
+            {
+              "id": "CMP-13",
+              "nameZh": "单项选择",
+              "rationale": "N1 建议 component",
+              "recommended": false,
+              "fromN1": true
+            },
+            {
+              "id": "CMP-02",
+              "nameZh": "互动选择",
+              "rationale": "模版可承载文字",
+              "recommended": false
+            },
+            {
+              "id": "CMP-04",
+              "nameZh": "Mission发布",
+              "rationale": "模版可承载文字",
+              "recommended": false
+            }
+          ],
+          "selectedComponentId": "CMP-12"
+        }
+      ]
+    },
+    {
+      "phase": "P2",
+      "scriptStep": 9,
+      "name": "CONTEXT STORY — IS SHE YOUR FRIEND?",
+      "purpose": "语境中理解\"她是你的朋友吗？\"的含义",
+      "activities": [
+        {
+          "id": "9.1",
+          "title": "情境回放聚焦目标知识点",
+          "intent": "【情境回放聚焦目标知识点】服务教学目的「语境中理解\"她是你的朋友吗？\"的含义」",
+          "sourceAnchor": "**Replay.** 老师： 她是你的朋友吗？ Tom： 是。她是我的朋友。 **Freeze.** **Kai:** The teacher is asking about Emma. Listen again.",
+          "candidates": [
+            {
+              "id": "CMP-03",
+              "nameZh": "视频播放",
+              "rationale": "活动类型：情境回放",
+              "recommended": true,
+              "fromN1": true
+            },
+            {
+              "id": "CMP-05",
+              "nameZh": "视频文字讲解",
+              "rationale": "活动类型：情境回放",
+              "recommended": false
+            },
+            {
+              "id": "CMP-08",
+              "nameZh": "听音跟读",
+              "rationale": "匹配「听音跟读」",
+              "recommended": false
+            },
+            {
+              "id": "CMP-33",
+              "nameZh": "选择题（传统版）",
+              "rationale": "N1 建议 component",
+              "recommended": false,
+              "fromN1": true
+            },
+            {
+              "id": "CMP-09",
+              "nameZh": "全屏大图",
+              "rationale": "N1 建议 component",
+              "recommended": false,
+              "fromN1": true
+            }
+          ],
+          "selectedComponentId": "CMP-03"
+        },
+        {
+          "id": "9.2",
+          "title": "探索「朋友」含义",
+          "intent": "【探索「朋友」含义】服务教学目的「语境中理解\"她是你的朋友吗？\"的含义」",
+          "sourceAnchor": "**Audio:** 她是你的朋友吗？ **Kai:** You already know: 她 是 吗 So this is a question. What is the teacher asking? **Choices:** A. Is she your teacher? B. Is she your friend? C. Is she from China? **Student chooses B.** **Kai:** Exactly. She is asking: Is she your friend? ---",
+          "candidates": [
+            {
+              "id": "CMP-13",
+              "nameZh": "单项选择",
+              "rationale": "适合：模版含选项/答案，匹配听辨或含义推断",
+              "recommended": true
+            },
+            {
+              "id": "CMP-33",
+              "nameZh": "选择题（传统版）",
+              "rationale": "适合：模版含选项/答案，匹配听辨或含义推断",
+              "recommended": false,
+              "fromN1": true
+            },
+            {
+              "id": "CMP-02",
+              "nameZh": "互动选择",
+              "rationale": "适合：模版含选项/答案，匹配听辨或含义推断",
+              "recommended": false
+            },
+            {
+              "id": "CMP-12",
+              "nameZh": "词块造句",
+              "rationale": "适合：模版含选项/答案，匹配听辨或含义推断",
+              "recommended": false
+            },
+            {
+              "id": "CMP-14",
+              "nameZh": "句型变换",
+              "rationale": "适合：模版含选项/答案，匹配听辨或含义推断",
+              "recommended": false
+            }
+          ],
+          "selectedComponentId": "CMP-13"
+        }
+      ]
+    },
+    {
+      "phase": "P2",
+      "scriptStep": 10,
+      "name": "DISCOVERY — 的",
+      "purpose": "发现\"的\"表示所有/关联关系的语法功能",
+      "activities": [
+        {
+          "id": "10.1",
+          "title": "发现「的」表所属",
+          "intent": "【发现「的」表所属】服务教学目的「发现\"的\"表示所有/关联关系的语法功能」",
+          "sourceAnchor": "**Screen:** 你的朋友 我的朋友 **Kai:** Look carefully. You know: 你 = you 我 = I / me **学生拖：** 我的朋友，, 你的朋友 Now look: 你的 我的 **Highlight** 的. **Kai:** Something changed. What do you think 的 is doing? **Visual:** Student avatar → friend 我的朋友 Tom → Emma 他的朋友 **Choices:** A. Shows who someone belongs or connects to B. Makes a…",
+          "candidates": [
+            {
+              "id": "CMP-13",
+              "nameZh": "单项选择",
+              "rationale": "适合：模版含选项/答案，匹配听辨或含义推断",
+              "recommended": true,
+              "fromN1": true
+            },
+            {
+              "id": "CMP-33",
+              "nameZh": "选择题（传统版）",
+              "rationale": "适合：模版含选项/答案，匹配听辨或含义推断",
+              "recommended": false
+            },
+            {
+              "id": "CMP-02",
+              "nameZh": "互动选择",
+              "rationale": "适合：模版含选项/答案，匹配听辨或含义推断",
+              "recommended": false
+            },
+            {
+              "id": "CMP-24",
+              "nameZh": "单轮情境口语作答",
+              "rationale": "适合：模版含选项/答案，匹配听辨或含义推断",
+              "recommended": false,
+              "fromN1": true
+            },
+            {
+              "id": "CMP-11",
+              "nameZh": "句型观察",
+              "rationale": "活动类型：语素/规律发现",
+              "recommended": false,
+              "fromN1": true
+            }
+          ],
+          "selectedComponentId": "CMP-13"
+        },
+        {
+          "id": "10.2",
+          "title": "词块造句 / 句型建构",
+          "intent": "【词块造句 / 句型建构】服务教学目的「发现\"的\"表示所有/关联关系的语法功能」",
+          "sourceAnchor": "Student builds:** 他的 她的 **Kai:** You found it. **Screen:** 我 → 我的 你 → 你的 他 → 他的 她 → 她的 ---",
+          "candidates": [
+            {
+              "id": "CMP-12",
+              "nameZh": "词块造句",
+              "rationale": "匹配「词块造句」",
+              "recommended": true
+            },
+            {
+              "id": "CMP-07",
+              "nameZh": "句型学习",
+              "rationale": "活动类型：句型学习备选",
+              "recommended": false
+            },
+            {
+              "id": "CMP-11",
+              "nameZh": "句型观察",
+              "rationale": "N1 建议 component",
+              "recommended": false,
+              "fromN1": true
+            },
+            {
+              "id": "CMP-13",
+              "nameZh": "单项选择",
+              "rationale": "N1 建议 component",
+              "recommended": false,
+              "fromN1": true
+            },
+            {
+              "id": "CMP-24",
+              "nameZh": "单轮情境口语作答",
+              "rationale": "N1 建议 component",
+              "recommended": false,
+              "fromN1": true
+            }
+          ],
+          "selectedComponentId": "CMP-12"
+        }
+      ]
+    },
+    {
+      "phase": "P2",
+      "scriptStep": 11,
+      "name": "DISCOVERY — 朋友",
+      "purpose": "从语境中理解\"朋友\"的含义",
+      "activities": [
+        {
+          "id": "11.1",
+          "title": "探索「朋友」含义",
+          "intent": "【探索「朋友」含义】服务教学目的「从语境中理解\"朋友\"的含义」",
+          "sourceAnchor": "**Replay.** Tom： 她是我的朋友。 **Freeze.** **Visual:** Tom and Emma smiling together. **Kai:** Tom and Emma know each other. They study together. You already know: 同学 Emma is Tom's 同学. But Tom says another word. **Replay:** 她是我的朋友。 **Highlight:** 朋友 **Kai:** Look at them. What do you think 朋友 means? **Choices:** A. Teacher…",
+          "candidates": [
+            {
+              "id": "CMP-13",
+              "nameZh": "单项选择",
+              "rationale": "适合：模版含选项/答案，匹配听辨或含义推断",
+              "recommended": true
+            },
+            {
+              "id": "CMP-33",
+              "nameZh": "选择题（传统版）",
+              "rationale": "适合：模版含选项/答案，匹配听辨或含义推断",
+              "recommended": false,
+              "fromN1": true
+            },
+            {
+              "id": "CMP-02",
+              "nameZh": "互动选择",
+              "rationale": "适合：模版含选项/答案，匹配听辨或含义推断",
+              "recommended": false
+            },
+            {
+              "id": "CMP-12",
+              "nameZh": "词块造句",
+              "rationale": "适合：模版含选项/答案，匹配听辨或含义推断",
+              "recommended": false
+            },
+            {
+              "id": "CMP-14",
+              "nameZh": "句型变换",
+              "rationale": "适合：模版含选项/答案，匹配听辨或含义推断",
+              "recommended": false
+            }
+          ],
+          "selectedComponentId": "CMP-13"
+        },
+        {
+          "id": "11.2",
+          "title": "听音跟读目标句",
+          "intent": "【听音跟读目标句】服务教学目的「从语境中理解\"朋友\"的含义」",
+          "sourceAnchor": "Student repeats. **Kai:** Emma is Tom's classmate. She is also his friend. ---",
+          "candidates": [
+            {
+              "id": "CMP-08",
+              "nameZh": "听音跟读",
+              "rationale": "匹配「听音跟读」",
+              "recommended": true,
+              "fromN1": true
+            },
+            {
+              "id": "CMP-33",
+              "nameZh": "选择题（传统版）",
+              "rationale": "N1 建议 component",
+              "recommended": false,
+              "fromN1": true
+            },
+            {
+              "id": "CMP-03",
+              "nameZh": "视频播放",
+              "rationale": "N1 建议 component",
+              "recommended": false,
+              "fromN1": true
+            },
+            {
+              "id": "CMP-09",
+              "nameZh": "全屏大图",
+              "rationale": "N1 建议 component",
+              "recommended": false,
+              "fromN1": true
+            },
+            {
+              "id": "CMP-02",
+              "nameZh": "互动选择",
+              "rationale": "模版可承载文字",
+              "recommended": false
+            }
+          ],
+          "selectedComponentId": "CMP-08"
+        }
+      ]
+    },
+    {
+      "phase": "P2",
+      "scriptStep": 12,
+      "name": "PATTERN DISCOVERY",
+      "purpose": "归纳\"是+我的/你的/他的/她的+朋友\"句型",
+      "activities": [
+        {
+          "id": "12.1",
+          "title": "归纳\"是+我的/你的/他的/她的+朋友\"句型",
+          "intent": "【归纳\"是+我的/你的/他的/她的+朋友\"句型】服务教学目的「归纳\"是+我的/你的/他的/她的+朋友\"句型」",
+          "sourceAnchor": "**Screen:** 她是我的朋友。 **Kai:** Look at the pattern. **Screen:** [PERSON] + 是 + [MY/YOUR/HIS/HER] + 朋友 **",
+          "candidates": [
+            {
+              "id": "CMP-07",
+              "nameZh": "句型学习",
+              "rationale": "匹配「句型观察/对比」",
+              "recommended": true,
+              "fromN1": true
+            },
+            {
+              "id": "CMP-11",
+              "nameZh": "句型观察",
+              "rationale": "匹配「句型观察/对比」",
+              "recommended": false
+            },
+            {
+              "id": "CMP-10",
+              "nameZh": "图文卡片",
+              "rationale": "匹配「句型观察/对比」",
+              "recommended": false
+            },
+            {
+              "id": "CMP-15",
+              "nameZh": "角色扮演对话",
+              "rationale": "N1 建议 component",
+              "recommended": false,
+              "fromN1": true
+            },
+            {
+              "id": "CMP-35",
+              "nameZh": "发音练习",
+              "rationale": "N1 建议 component",
+              "recommended": false,
+              "fromN1": true
+            }
+          ],
+          "selectedComponentId": "CMP-07"
+        },
+        {
+          "id": "12.2",
+          "title": "指人说「她是我的朋友」",
+          "intent": "【指人说「她是我的朋友」】服务教学目的「归纳\"是+我的/你的/他的/她的+朋友\"句型」",
+          "sourceAnchor": "Kai shows Emma.** **Kai:** Emma is my friend. **Student:** 她是我的朋友。 **",
+          "candidates": [
+            {
+              "id": "CMP-24",
+              "nameZh": "单轮情境口语作答",
+              "rationale": "适合：单轮情境口语，匹配「看提示→说出目标句」",
+              "recommended": true
+            },
+            {
+              "id": "CMP-25",
+              "nameZh": "快速视觉口语识别",
+              "rationale": "可用：视觉线索促说，但模版偏选择/快答",
+              "recommended": false
+            },
+            {
+              "id": "CMP-35",
+              "nameZh": "发音练习",
+              "rationale": "可用：可练目标句发音，但弱化意义→形式产出",
+              "recommended": false,
+              "fromN1": true
+            },
+            {
+              "id": "CMP-07",
+              "nameZh": "句型学习",
+              "rationale": "N1 建议 component",
+              "recommended": false,
+              "fromN1": true
+            },
+            {
+              "id": "CMP-15",
+              "nameZh": "角色扮演对话",
+              "rationale": "N1 建议 component",
+              "recommended": false,
+              "fromN1": true
+            }
+          ],
+          "selectedComponentId": "CMP-24"
+        },
+        {
+          "id": "12.3",
+          "title": "指人说「他是我的朋友」",
+          "intent": "【指人说「他是我的朋友」】服务教学目的「归纳\"是+我的/你的/他的/她的+朋友\"句型」",
+          "sourceAnchor": "Kai shows Jayden.** **Kai:** Jayden is my friend. **Student:** 他是我的朋友。 **Kai asks:** 她是你的朋友吗？ **Student:** 是。她是我的朋友。 **Kai asks:** 他是你的朋友吗？ **Student:** 是。他是我的朋友。 If negative option needed: **",
+          "candidates": [
+            {
+              "id": "CMP-24",
+              "nameZh": "单轮情境口语作答",
+              "rationale": "适合：单轮情境口语，匹配「看提示→说出目标句」",
+              "recommended": true
+            },
+            {
+              "id": "CMP-25",
+              "nameZh": "快速视觉口语识别",
+              "rationale": "可用：视觉线索促说，但模版偏选择/快答",
+              "recommended": false
+            },
+            {
+              "id": "CMP-35",
+              "nameZh": "发音练习",
+              "rationale": "可用：可练目标句发音，但弱化意义→形式产出",
+              "recommended": false,
+              "fromN1": true
+            },
+            {
+              "id": "CMP-07",
+              "nameZh": "句型学习",
+              "rationale": "N1 建议 component",
+              "recommended": false,
+              "fromN1": true
+            },
+            {
+              "id": "CMP-15",
+              "nameZh": "角色扮演对话",
+              "rationale": "N1 建议 component",
+              "recommended": false,
+              "fromN1": true
+            }
+          ],
+          "selectedComponentId": "CMP-24"
+        },
+        {
+          "id": "12.4",
+          "title": "指人说「不是他不是我的朋友」",
+          "intent": "【指人说「不是他不是我的朋友」】服务教学目的「归纳\"是+我的/你的/他的/她的+朋友\"句型」",
+          "sourceAnchor": "Kai shows unknown student.** **Kai:** 他是你的朋友吗？ **Student:** 不是。他不是我的朋友。 **Kai:** Good. You can say yes. You can say no. ---",
+          "candidates": [
+            {
+              "id": "CMP-24",
+              "nameZh": "单轮情境口语作答",
+              "rationale": "适合：单轮情境口语，匹配「看提示→说出目标句」",
+              "recommended": true
+            },
+            {
+              "id": "CMP-25",
+              "nameZh": "快速视觉口语识别",
+              "rationale": "可用：视觉线索促说，但模版偏选择/快答",
+              "recommended": false
+            },
+            {
+              "id": "CMP-35",
+              "nameZh": "发音练习",
+              "rationale": "可用：可练目标句发音，但弱化意义→形式产出",
+              "recommended": false,
+              "fromN1": true
+            },
+            {
+              "id": "CMP-07",
+              "nameZh": "句型学习",
+              "rationale": "N1 建议 component",
+              "recommended": false,
+              "fromN1": true
+            },
+            {
+              "id": "CMP-15",
+              "nameZh": "角色扮演对话",
+              "rationale": "N1 建议 component",
+              "recommended": false,
+              "fromN1": true
+            }
+          ],
+          "selectedComponentId": "CMP-24"
+        }
+      ]
+    },
+    {
+      "phase": "P2",
+      "scriptStep": 13,
+      "name": "PRACTICE — COUNTRY + FRIEND",
+      "purpose": "综合练习：询问姓名、国籍、确认朋友关系",
+      "activities": [
+        {
+          "id": "13.1",
+          "title": "综合练习：询问姓名、国籍、确认朋友关系",
+          "intent": "【综合练习：询问姓名、国籍、确认朋友关系】服务教学目的「综合练习：询问姓名、国籍、确认朋友关系」",
+          "sourceAnchor": "**Story** **Kai:** Great! Now you know how to ask where someone is from. Let's go and meet your new friends. Some students have just arrived at the International Chinese School. Can you help welcome them? **Friend 1 (Full Support)** **Kai:** Let's do the first one together. Emma walks over. Emma： 你好！ **Kai:** Start by…",
+          "candidates": [
+            {
+              "id": "CMP-11",
+              "nameZh": "句型观察",
+              "rationale": "适合：模版有 3 个【例句】槽，可并排呈现「你叫什么名字？」与「你是哪国人？」供观察对比；目的「通过对比自主发现结构」",
+              "recommended": true
+            },
+            {
+              "id": "CMP-07",
+              "nameZh": "句型学习",
+              "rationale": "适合：左右例句+公式支架，可对照「你叫什么名字？」与「你是哪国人？」并点出结构差异",
+              "recommended": false
+            },
+            {
+              "id": "CMP-10",
+              "nameZh": "图文卡片",
+              "rationale": "可用：图文卡可承载对比文案，但原型偏单点聚焦，两句并排略勉强",
+              "recommended": false
+            },
+            {
+              "id": "CMP-16",
+              "nameZh": "图文介绍",
+              "rationale": "可用：图文卡可承载对比文案，但原型偏单点聚焦，两句并排略勉强",
+              "recommended": false
+            },
+            {
+              "id": "CMP-01",
+              "nameZh": "课前寒暄",
+              "rationale": "匹配「开场寒暄」",
+              "recommended": false
+            }
+          ],
+          "selectedComponentId": "CMP-11",
+          "selectionThinking": "选型思考：本活动要展示并对比「你叫什么名字？」与「你是哪国人？」，让学生观察差异，不是先做选择题。 因此优先模版能挂多句的组件（句型观察/句型学习/图文卡），下调单项选择。 推荐顺序：CMP-11 句型观察 → CMP-07 句型学习 → CMP-10 图文卡片"
+        }
+      ]
+    },
+    {
+      "phase": "P3",
+      "scriptStep": 15,
+      "name": "MISSION READY",
+      "purpose": "明确任务目标，为真实任务做准备",
+      "activities": [
+        {
+          "id": "15.1",
+          "title": "明确任务目标",
+          "intent": "【明确任务目标】服务教学目的「明确任务目标，为真实任务做准备」",
+          "sourceAnchor": "**Screen:** Mission goals: ✓ Ask where someone is from ✓ Say where you are from ✓ Talk about Chinese, American and British people ✓ Say who your friend is ✓ Ask if someone is your friend **Kai:** You know what to say. But do you understand the story now? Let's find out. ---",
+          "candidates": [
+            {
+              "id": "CMP-18",
+              "nameZh": "AI Mission Setup",
+              "rationale": "匹配「任务板 / 表演」",
+              "recommended": true,
+              "fromN1": true
+            },
+            {
+              "id": "CMP-04",
+              "nameZh": "Mission发布",
+              "rationale": "匹配「Mission / Goals」",
+              "recommended": false
+            },
+            {
+              "id": "CMP-32",
+              "nameZh": "学习目标",
+              "rationale": "匹配「Mission / Goals」",
+              "recommended": false
+            },
+            {
+              "id": "CMP-19",
+              "nameZh": "AI开放任务对话",
+              "rationale": "匹配「任务板 / 表演」",
+              "recommended": false
+            },
+            {
+              "id": "CMP-24",
+              "nameZh": "单轮情境口语作答",
+              "rationale": "匹配「任务板 / 表演」",
+              "recommended": false
+            }
+          ],
+          "selectedComponentId": "CMP-18"
+        }
+      ]
+    },
+    {
+      "phase": "P3",
+      "scriptStep": 16,
+      "name": "THE WO HUI MOMENT — STORY REPLAY",
+      "purpose": "回放故事，验证理解力提升",
+      "activities": [
+        {
+          "id": "16.1",
+          "title": "观看开场故事",
+          "intent": "【观看开场故事】服务教学目的「回放故事，验证理解力提升」",
+          "sourceAnchor": "**Kai:** Remember the story from the beginning? Watch again. No subtitles. **Opening story plays in full.** No subtitles. **Video ends.** Pause. **Kai:** Now you know their names. You know where they are from. You know who is friends with who. Pause. **Kai:** a few missions agaon,these were just Chinese sounds, now…",
+          "candidates": [
+            {
+              "id": "CMP-03",
+              "nameZh": "视频播放",
+              "rationale": "匹配「观看 / 故事」",
+              "recommended": true,
+              "fromN1": true
+            },
+            {
+              "id": "CMP-05",
+              "nameZh": "视频文字讲解",
+              "rationale": "匹配「观看 / 故事」",
+              "recommended": false
+            },
+            {
+              "id": "CMP-23",
+              "nameZh": "半屏大图",
+              "rationale": "匹配「观看 / 故事」",
+              "recommended": false
+            },
+            {
+              "id": "CMP-02",
+              "nameZh": "互动选择",
+              "rationale": "模版可承载文字",
+              "recommended": false
+            },
+            {
+              "id": "CMP-04",
+              "nameZh": "Mission发布",
+              "rationale": "模版可承载文字",
+              "recommended": false
+            }
+          ],
+          "selectedComponentId": "CMP-03"
+        }
+      ]
+    },
+    {
+      "phase": "P3",
+      "scriptStep": 17,
+      "name": "REAL-WORLD PERFORMANCE MISSION — MEET FRIENDS FROM AROUND THE WORLD",
+      "purpose": "综合运用所学知识，完成真实任务",
+      "activities": [
+        {
+          "id": "17.1",
+          "title": "探索「朋友」含义",
+          "intent": "【探索「朋友」含义】服务教学目的「综合运用所学知识，完成真实任务」",
+          "sourceAnchor": "**Mission** Build Our International Class board **Story** **Kai** 😊 Our classroom is getting ready for international day. Every student needs to be added to our international class board. Can you help me finish it? The classroom wall appears. Three profile cards remain blank. Emma Country? Friend? ------------- Tom…",
+          "candidates": [
+            {
+              "id": "CMP-13",
+              "nameZh": "单项选择",
+              "rationale": "适合：模版含选项/答案，匹配听辨或含义推断",
+              "recommended": true
+            },
+            {
+              "id": "CMP-24",
+              "nameZh": "单轮情境口语作答",
+              "rationale": "适合：模版含选项/答案，匹配听辨或含义推断",
+              "recommended": false
+            },
+            {
+              "id": "CMP-02",
+              "nameZh": "互动选择",
+              "rationale": "适合：模版含选项/答案，匹配听辨或含义推断",
+              "recommended": false
+            },
+            {
+              "id": "CMP-12",
+              "nameZh": "词块造句",
+              "rationale": "适合：模版含选项/答案，匹配听辨或含义推断",
+              "recommended": false
+            },
+            {
+              "id": "CMP-14",
+              "nameZh": "句型变换",
+              "rationale": "适合：模版含选项/答案，匹配听辨或含义推断",
+              "recommended": false
+            }
+          ],
+          "selectedComponentId": "CMP-13"
+        }
+      ]
+    },
+    {
+      "phase": "P4",
+      "scriptStep": 18,
+      "name": "TODAY YOU CAN",
+      "purpose": "总结本课核心能力，建立成就感和学习信心",
+      "activities": [
+        {
+          "id": "18.1",
+          "title": "总结与收获",
+          "intent": "【总结与收获】服务教学目的「总结本课核心能力，建立成就感和学习信心」",
+          "sourceAnchor": "**Today You Can** ✓ Ask someone's name. ✓ Ask where someone is from. ✓ Introduce a friend. ✓ Say where someone is from. ✓ Welcome new classmates. ---",
+          "candidates": [
+            {
+              "id": "CMP-21",
+              "nameZh": "关键表达回顾-句",
+              "rationale": "匹配「总结收束」",
+              "recommended": true,
+              "fromN1": true
+            },
+            {
+              "id": "CMP-36",
+              "nameZh": "总结",
+              "rationale": "匹配「总结收束」",
+              "recommended": false,
+              "fromN1": true
+            },
+            {
+              "id": "CMP-01",
+              "nameZh": "课前寒暄",
+              "rationale": "匹配「开场寒暄」",
+              "recommended": false
+            },
+            {
+              "id": "CMP-26",
+              "nameZh": "关键表达回顾-词",
+              "rationale": "匹配「总结收束」",
+              "recommended": false
+            },
+            {
+              "id": "CMP-22",
+              "nameZh": "下集预告",
+              "rationale": "匹配「总结收束」",
+              "recommended": false
+            }
+          ],
+          "selectedComponentId": "CMP-21"
+        }
+      ]
+    },
+    {
+      "phase": "P4",
+      "scriptStep": 19,
+      "name": "WO HUI MOMENT & KEY TAKEAWAYS",
+      "purpose": "回顾学习旅程、巩固关键表达、展望未来",
+      "activities": [
+        {
+          "id": "19.1",
+          "title": "总结与收获",
+          "intent": "【总结与收获】服务教学目的「回顾学习旅程、巩固关键表达、展望未来」",
+          "sourceAnchor": "**Wo Hui Moment** The Journey Map opens. Mission 4 lights up. **Kai:** Today, you used Chinese to meet people from around the world. **Screen** WO HUI Mission Complete --- **Key takeaways** 你是哪国旗人 ？ 我是英国人。 她是美国人。 我的朋友是中国人。 他的朋友也是中国人。",
+          "candidates": [
+            {
+              "id": "CMP-26",
+              "nameZh": "关键表达回顾-词",
+              "rationale": "匹配「总结收束」",
+              "recommended": true,
+              "fromN1": true
+            },
+            {
+              "id": "CMP-22",
+              "nameZh": "下集预告",
+              "rationale": "匹配「总结收束」",
+              "recommended": false,
+              "fromN1": true
+            },
+            {
+              "id": "CMP-21",
+              "nameZh": "关键表达回顾-句",
+              "rationale": "匹配「总结收束」",
+              "recommended": false
+            },
+            {
+              "id": "CMP-09",
+              "nameZh": "全屏大图",
+              "rationale": "匹配「图片 / 图文」",
+              "recommended": false
+            },
+            {
+              "id": "CMP-10",
+              "nameZh": "图文卡片",
+              "rationale": "匹配「图片 / 图文」",
+              "recommended": false
+            }
+          ],
+          "selectedComponentId": "CMP-26"
+        }
+      ]
+    }
+  ]
+}

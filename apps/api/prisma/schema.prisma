@@ -1,0 +1,139 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum MissionStatus {
+  draft
+  in_review
+  approved
+  published
+  archived
+}
+
+enum NodeId {
+  N0
+  N1
+  N2
+  N3
+  N4
+  N5
+}
+
+enum NodeRunStatus {
+  pending
+  running
+  awaiting_activity_selection
+  awaiting_review
+  approved
+  failed
+  stale
+}
+
+enum DecisionType {
+  choice
+  confirm
+  edit_required
+  warning_ack
+}
+
+enum DecisionSeverity {
+  blocking
+  deferrable
+  info
+}
+
+model Mission {
+  id                 String        @id @default(uuid())
+  name               String
+  topic              String
+  status             MissionStatus @default(draft)
+  currentNode        NodeId        @default(N0)
+  masterDataVersion  String        @default("v0729")
+  ownerName          String        @default("CD")
+  createdAt          DateTime      @default(now())
+  updatedAt          DateTime      @updatedAt
+
+  nodeRuns   NodeRun[]
+  artifacts  Artifact[]
+  decisions  Decision[]
+  auditEvents AuditEvent[]
+}
+
+model NodeRun {
+  id        String        @id @default(uuid())
+  missionId String
+  node      NodeId
+  status    NodeRunStatus @default(pending)
+  attempt   Int           @default(1)
+  error     String?
+  startedAt DateTime?
+  finishedAt DateTime?
+  approvedAt DateTime?
+  approvedBy String?
+  createdAt DateTime      @default(now())
+  updatedAt DateTime      @updatedAt
+
+  mission   Mission    @relation(fields: [missionId], references: [id], onDelete: Cascade)
+  decisions Decision[]
+
+  @@unique([missionId, node, attempt])
+  @@index([missionId, node])
+}
+
+model Artifact {
+  id        String   @id @default(uuid())
+  missionId String
+  node      NodeId
+  kind      String
+  label     String
+  content   String   @db.Text
+  mimeType  String   @default("text/markdown")
+  version   Int      @default(1)
+  createdAt DateTime @default(now())
+
+  mission Mission @relation(fields: [missionId], references: [id], onDelete: Cascade)
+
+  @@index([missionId, node])
+}
+
+model Decision {
+  id          String           @id @default(uuid())
+  missionId   String
+  nodeRunId   String?
+  node        NodeId
+  targetType  String
+  targetId    String?
+  type        DecisionType
+  severity    DecisionSeverity
+  question    String
+  optionsJson String           @default("[]")
+  aiRationale String?
+  resolved    Boolean          @default(false)
+  resolutionJson String?
+  resolvedAt  DateTime?
+  resolvedBy  String?
+  createdAt   DateTime         @default(now())
+
+  mission Mission  @relation(fields: [missionId], references: [id], onDelete: Cascade)
+  nodeRun NodeRun? @relation(fields: [nodeRunId], references: [id], onDelete: SetNull)
+
+  @@index([missionId, node, resolved])
+}
+
+model AuditEvent {
+  id        String   @id @default(uuid())
+  missionId String
+  actor     String
+  action    String
+  payload   String   @default("{}")
+  createdAt DateTime @default(now())
+
+  mission Mission @relation(fields: [missionId], references: [id], onDelete: Cascade)
+
+  @@index([missionId, createdAt])
+}

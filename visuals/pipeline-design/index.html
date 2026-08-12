@@ -1,0 +1,761 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>课程内容制作 Pipeline · 设计图</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display&family=Outfit:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg: #f7f5f0;
+  --card: #ffffff;
+  --border: #e9e3d6;
+  --line-soft: #ebe5d8;
+  --primary: #2f6f5e;
+  --primary-soft: rgba(47, 111, 94, 0.08);
+  --primary-mid: rgba(47, 111, 94, 0.18);
+  --accent: #c97b3f;
+  --accent-soft: rgba(201, 123, 63, 0.10);
+  --accent-mid: rgba(201, 123, 63, 0.25);
+  --text: #14171e;
+  --text-mid: #3a4256;
+  --text-soft: #7c7a72;
+}
+
+* { box-sizing: border-box; }
+body {
+  margin: 0;
+  background: var(--bg);
+  color: var(--text);
+  font-family: 'Outfit', -apple-system, BlinkMacSystemFont, sans-serif;
+  font-size: 15px;
+  line-height: 1.55;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* Subtle corner gradients */
+body::before {
+  content: "";
+  position: fixed;
+  top: -200px;
+  right: -200px;
+  width: 500px;
+  height: 500px;
+  background: radial-gradient(circle, var(--primary-soft) 0%, transparent 70%);
+  pointer-events: none;
+  z-index: 0;
+}
+body::after {
+  content: "";
+  position: fixed;
+  bottom: -200px;
+  left: -200px;
+  width: 500px;
+  height: 500px;
+  background: radial-gradient(circle, var(--accent-soft) 0%, transparent 70%);
+  pointer-events: none;
+  z-index: 0;
+}
+
+.wrap {
+  max-width: 1120px;
+  margin: 0 auto;
+  padding: 72px 32px 100px;
+  position: relative;
+  z-index: 1;
+}
+
+/* ---------- HERO ---------- */
+.hero {
+  margin-bottom: 72px;
+  max-width: 760px;
+}
+.hero h1 {
+  font-family: 'DM Serif Display', serif;
+  font-size: 52px;
+  font-weight: 400;
+  letter-spacing: -0.01em;
+  line-height: 1.08;
+  margin: 0 0 18px;
+  color: var(--text);
+}
+.hero p {
+  font-size: 17px;
+  color: var(--text-mid);
+  margin: 0;
+  max-width: 620px;
+}
+.hero .meta {
+  margin-top: 28px;
+  display: flex;
+  gap: 28px;
+  flex-wrap: wrap;
+}
+.meta-item {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 13px;
+  color: var(--text-soft);
+}
+.meta-item svg {
+  color: var(--primary);
+  width: 16px;
+  height: 16px;
+}
+.meta-item strong {
+  color: var(--text);
+  font-weight: 600;
+}
+
+/* ---------- STEPPER ---------- */
+.section-label {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--text-soft);
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  margin-bottom: 20px;
+}
+.section-label::before {
+  content: "";
+  width: 24px;
+  height: 1px;
+  background: var(--text-soft);
+}
+
+.stepper {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  gap: 0;
+  margin-bottom: 80px;
+  position: relative;
+}
+.stepper-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  position: relative;
+  padding: 0 8px;
+}
+.stepper-num {
+  width: 52px;
+  height: 52px;
+  border-radius: 50%;
+  background: var(--card);
+  border: 2px solid var(--primary);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: 'DM Serif Display', serif;
+  font-size: 24px;
+  color: var(--primary);
+  position: relative;
+  z-index: 2;
+  margin-bottom: 14px;
+  box-shadow: 0 4px 12px rgba(47, 111, 94, 0.10);
+  transition: transform 0.2s;
+}
+.stepper-item:hover .stepper-num { transform: translateY(-2px); }
+.stepper-item.checkpoint .stepper-num {
+  background: var(--accent);
+  color: white;
+  border-color: var(--accent);
+  box-shadow: 0 4px 12px rgba(201, 123, 63, 0.20);
+}
+.stepper-label {
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--text);
+  margin-bottom: 4px;
+}
+.stepper-sub {
+  font-size: 12px;
+  color: var(--text-soft);
+  font-family: 'JetBrains Mono', monospace;
+}
+.stepper-cp {
+  margin-top: 6px;
+  display: inline-block;
+  font-size: 10px;
+  font-weight: 600;
+  color: var(--accent);
+  background: var(--accent-soft);
+  padding: 2px 8px;
+  border-radius: 999px;
+  letter-spacing: 0.05em;
+}
+.stepper-arrow {
+  position: absolute;
+  top: 25px;
+  right: -16px;
+  width: 32px;
+  height: 2px;
+  background: var(--primary-mid);
+  z-index: 1;
+}
+.stepper-arrow::after {
+  content: "";
+  position: absolute;
+  right: -1px;
+  top: -4px;
+  width: 0;
+  height: 0;
+  border-left: 7px solid var(--primary);
+  border-top: 5px solid transparent;
+  border-bottom: 5px solid transparent;
+}
+
+/* ---------- STEP CARDS ---------- */
+.script_steps-grid {
+  display: grid;
+  gap: 20px;
+  margin-bottom: 80px;
+}
+.script_step-card {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 20px;
+  padding: 28px 32px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.03);
+  display: grid;
+  grid-template-columns: 1fr 340px;
+  gap: 32px;
+  align-items: stretch;
+  transition: all 0.2s;
+}
+.script_step-card:hover {
+  border-color: var(--primary-mid);
+  box-shadow: 0 6px 20px rgba(47, 111, 94, 0.06);
+}
+.script_step-card-left {
+  display: flex;
+  flex-direction: column;
+}
+.script_step-card-header {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  margin-bottom: 18px;
+  padding-bottom: 18px;
+  border-bottom: 1px solid var(--line-soft);
+}
+.script_step-card-num {
+  font-family: 'DM Serif Display', serif;
+  font-size: 36px;
+  color: var(--primary);
+  line-height: 1;
+  min-width: 36px;
+}
+.script_step-card-num-block {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+.script_step-card-subtitle {
+  font-size: 11px;
+  color: var(--text-soft);
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  font-weight: 500;
+}
+.script_step-card-title {
+  font-family: 'DM Serif Display', serif;
+  font-size: 22px;
+  color: var(--text);
+  margin: 0;
+  font-weight: 400;
+  line-height: 1.2;
+}
+
+.io-row {
+  display: grid;
+  grid-template-columns: 72px 1fr;
+  gap: 16px;
+  align-items: start;
+  padding: 8px 0;
+}
+.io-label {
+  font-size: 11px;
+  color: var(--text-soft);
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  font-weight: 600;
+  padding-top: 4px;
+}
+.io-content {
+  font-size: 14px;
+  color: var(--text-mid);
+  line-height: 1.65;
+}
+.file {
+  display: inline-block;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 12.5px;
+  background: var(--primary-soft);
+  color: var(--primary);
+  padding: 3px 9px;
+  border-radius: 6px;
+  margin: 2px 6px 2px 0;
+  white-space: nowrap;
+}
+.file.accent {
+  background: var(--accent-soft);
+  color: var(--accent);
+}
+.io-note {
+  display: block;
+  margin-top: 4px;
+  font-size: 12.5px;
+  color: var(--text-soft);
+}
+
+/* Checkpoint box */
+.checkpoint-box {
+  background: var(--accent-soft);
+  border: 1px solid var(--accent-mid);
+  border-radius: 14px;
+  padding: 20px 22px;
+  display: flex;
+  flex-direction: column;
+}
+.checkpoint-label {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--accent);
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  margin-bottom: 12px;
+}
+.checkpoint-label svg {
+  width: 14px;
+  height: 14px;
+}
+.checkpoint-desc {
+  font-size: 13.5px;
+  color: var(--text);
+  line-height: 1.6;
+  margin: 0;
+  flex: 1;
+}
+.checkpoint-time {
+  margin-top: 14px;
+  padding-top: 12px;
+  border-top: 1px dashed var(--accent-mid);
+  font-size: 12px;
+  color: var(--text-soft);
+  font-family: 'JetBrains Mono', monospace;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+.checkpoint-time svg { width: 12px; height: 12px; }
+
+/* ---------- MASTER SECTION ---------- */
+.master-section {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 20px;
+  padding: 32px 36px;
+  margin-bottom: 32px;
+}
+.master-header {
+  margin-bottom: 24px;
+}
+.master-header h2 {
+  font-family: 'DM Serif Display', serif;
+  font-size: 26px;
+  font-weight: 400;
+  margin: 0 0 6px;
+}
+.master-header p {
+  font-size: 14px;
+  color: var(--text-mid);
+  margin: 0;
+}
+.master-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 16px;
+}
+.master-item {
+  display: flex;
+  align-items: flex-start;
+  gap: 14px;
+  padding: 18px;
+  background: var(--bg);
+  border-radius: 14px;
+  border: 1px solid var(--border);
+  transition: all 0.2s;
+}
+.master-item:hover {
+  border-color: var(--primary-mid);
+  background: var(--primary-soft);
+}
+.master-icon {
+  width: 36px;
+  height: 36px;
+  background: var(--card);
+  border-radius: 9px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--primary);
+  flex-shrink: 0;
+  border: 1px solid var(--border);
+}
+.master-item-title {
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--text);
+  margin: 0 0 4px;
+}
+.master-item-desc {
+  font-size: 12px;
+  color: var(--text-soft);
+  margin: 0;
+  font-family: 'JetBrains Mono', monospace;
+}
+
+/* ---------- FOOTER ---------- */
+.footer {
+  margin-top: 48px;
+  padding-top: 24px;
+  border-top: 1px solid var(--border);
+  font-size: 12px;
+  color: var(--text-soft);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 12px;
+}
+.footer-tag {
+  display: inline-block;
+  padding: 4px 10px;
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 999px;
+  font-family: 'JetBrains Mono', monospace;
+}
+
+/* ---------- RESPONSIVE ---------- */
+@media (max-width: 900px) {
+  .stepper {
+    grid-template-columns: 1fr;
+    gap: 20px;
+    margin-bottom: 48px;
+  }
+  .stepper-arrow { display: none; }
+  .script_step-card {
+    grid-template-columns: 1fr;
+    padding: 24px;
+  }
+  .master-grid { grid-template-columns: 1fr; }
+  .hero h1 { font-size: 38px; }
+  .wrap { padding: 48px 20px 80px; }
+}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <!-- HERO -->
+  <div class="hero">
+    <h1>课程内容制作<br>Pipeline 设计</h1>
+    <p>从口语化 script 到可喂给产品的前端组件数据，5 步可中断、可回滚、可 review 的工作流。每步都有 checkpoint，每步都能独立 review。</p>
+    <div class="meta">
+      <span class="meta-item">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 12h4l3-9 4 18 3-9h4"/></svg>
+        <strong>5 步</strong>处理流
+      </span>
+      <span class="meta-item">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><path d="M22 4 12 14.01l-3-3"/></svg>
+        <strong>5 个</strong>checkpoint
+      </span>
+      <span class="meta-item">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><path d="M14 2v6h6"/></svg>
+        <strong>2 份</strong>主数据
+      </span>
+      <span class="meta-item">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg>
+        约 <strong>55 min</strong> 全程 review
+      </span>
+    </div>
+  </div>
+
+  <!-- STEPPER -->
+  <div class="section-label">总览</div>
+  <div class="stepper">
+    <div class="stepper-item">
+      <div class="stepper-num">1</div>
+      <div class="stepper-label">Phase 划分</div>
+      <div class="stepper-sub">v0.1 → v0.2</div>
+    </div>
+    <div class="stepper-item">
+      <div class="stepper-arrow"></div>
+      <div class="stepper-num">2</div>
+      <div class="stepper-label">选 Component</div>
+      <div class="stepper-sub">→ v0.3</div>
+      <span class="stepper-cp">checkpoint 2</span>
+    </div>
+    <div class="stepper-item">
+      <div class="stepper-arrow"></div>
+      <div class="stepper-num">3</div>
+      <div class="stepper-label">填 Content</div>
+      <div class="stepper-sub">→ v0.4</div>
+      <span class="stepper-cp">checkpoint 3</span>
+    </div>
+    <div class="stepper-item">
+      <div class="stepper-arrow"></div>
+      <div class="stepper-num">4</div>
+      <div class="stepper-label">结构化</div>
+      <div class="stepper-sub">→ v0.5</div>
+      <span class="stepper-cp">checkpoint 4</span>
+    </div>
+    <div class="stepper-item checkpoint">
+      <div class="stepper-arrow"></div>
+      <div class="stepper-num">5</div>
+      <div class="stepper-label">喂产品预览</div>
+      <div class="stepper-sub">course preview</div>
+      <span class="stepper-cp">checkpoint 5</span>
+    </div>
+  </div>
+
+  <!-- STEP CARDS -->
+  <div class="section-label">详细</div>
+  <div class="script_steps-grid">
+
+    <!-- script_step 1 -->
+    <div class="script_step-card">
+      <div class="script_step-card-left">
+        <div class="script_step-card-header">
+          <div class="script_step-card-num">1</div>
+          <div class="script_step-card-num-block">
+            <div class="script_step-card-subtitle">script_step 1</div>
+            <h2 class="script_step-card-title">Script → Phase 框架</h2>
+          </div>
+        </div>
+        <div class="io-row">
+          <div class="io-label">Input</div>
+          <div class="io-content">
+            <span class="file">mission_x_script_v0.1.md</span>
+            <span class="io-note">口语化课程 script，原始输入</span>
+          </div>
+        </div>
+        <div class="io-row">
+          <div class="io-label">Output</div>
+          <div class="io-content">
+            <span class="file accent">mission_x_script_v0.2_phased.md</span>
+            <span class="io-note">叠加 phase 切分 + 每 script_step 教学目的</span>
+          </div>
+        </div>
+      </div>
+      <div class="checkpoint-box">
+        <div class="checkpoint-label">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg>
+          Checkpoint 1
+        </div>
+        <p class="checkpoint-desc">用户 review phase 切分是否合理 + 每 script_step 教学目的是否准确。常见 case：边界 script_step（如"Context Story"归 Phase 1 还是 Phase 2）。</p>
+        <div class="checkpoint-time">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg>
+          ~5 min
+        </div>
+      </div>
+    </div>
+
+    <!-- script_step 2 -->
+    <div class="script_step-card">
+      <div class="script_step-card-left">
+        <div class="script_step-card-header">
+          <div class="script_step-card-num">2</div>
+          <div class="script_step-card-num-block">
+            <div class="script_step-card-subtitle">script_step 2</div>
+            <h2 class="script_step-card-title">Phased Script → Component 匹配</h2>
+          </div>
+        </div>
+        <div class="io-row">
+          <div class="io-label">Input</div>
+          <div class="io-content">
+            <span class="file">v0.2_phased.md</span>
+            <span class="file">phase_component_eligibility.md</span>
+            <span class="io-note">前者是 mission 文件，后者是主数据</span>
+          </div>
+        </div>
+        <div class="io-row">
+          <div class="io-label">Output</div>
+          <div class="io-content">
+            <span class="file accent">v0.3_step_component_map.md</span>
+            <span class="io-note">每 script_step 选哪个 component + 角色 + 关键字段</span>
+          </div>
+        </div>
+      </div>
+      <div class="checkpoint-box">
+        <div class="checkpoint-label">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg>
+          Checkpoint 2
+        </div>
+        <p class="checkpoint-desc">用户 review 每个 script_step 选用的 component 是否合适 + 多个 component 共存是否合理。同时校验 Phase ↔ Component 映射表的 enforcement 是否过严/过松。</p>
+        <div class="checkpoint-time">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg>
+          ~5 min
+        </div>
+      </div>
+    </div>
+
+    <!-- script_step 3 -->
+    <div class="script_step-card">
+      <div class="script_step-card-left">
+        <div class="script_step-card-header">
+          <div class="script_step-card-num">3</div>
+          <div class="script_step-card-num-block">
+            <div class="script_step-card-subtitle">script_step 3</div>
+            <h2 class="script_step-card-title">Component Map → Content 填充</h2>
+          </div>
+        </div>
+        <div class="io-row">
+          <div class="io-label">Input</div>
+          <div class="io-content">
+            <span class="file">v0.3_step_component_map.md</span>
+            <span class="file">原 script</span>
+          </div>
+        </div>
+        <div class="io-row">
+          <div class="io-label">Output</div>
+          <div class="io-content">
+            <span class="file accent">v0.4_component_content.md</span>
+            <span class="io-note">每 component lesson_step 的具体 content（display text / audio / image / options...）</span>
+          </div>
+        </div>
+      </div>
+      <div class="checkpoint-box">
+        <div class="checkpoint-label">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg>
+          Checkpoint 3
+        </div>
+        <p class="checkpoint-desc">用户 review 文案是否符合教学语气 + 选项/答案/期望回答是否合理 + 需要人工补的素材清单。v0.4 的核心单位是 component lesson_step，不是 script_step。</p>
+        <div class="checkpoint-time">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg>
+          ~10 min
+        </div>
+      </div>
+    </div>
+
+    <!-- script_step 4 -->
+    <div class="script_step-card">
+      <div class="script_step-card-left">
+        <div class="script_step-card-header">
+          <div class="script_step-card-num">4</div>
+          <div class="script_step-card-num-block">
+            <div class="script_step-card-subtitle">script_step 4</div>
+            <h2 class="script_step-card-title">Content → Lesson Spec</h2>
+          </div>
+        </div>
+        <div class="io-row">
+          <div class="io-label">Input</div>
+          <div class="io-content">
+            <span class="file">v0.4_component_content.md</span>
+          </div>
+        </div>
+        <div class="io-row">
+          <div class="io-label">Output</div>
+          <div class="io-content">
+            <span class="file accent">v0.5_mission_spec.json</span> 或 <span class="file accent">.xlsx</span>
+            <span class="io-note">最终结构化数据，按产品 schema</span>
+          </div>
+        </div>
+      </div>
+      <div class="checkpoint-box">
+        <div class="checkpoint-label">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg>
+          Checkpoint 4
+        </div>
+        <p class="checkpoint-desc">校验字段命名与产品 schema 一致 + 必填字段都已填 + 元信息（mission id / title / 词汇 / 时长）齐全。</p>
+        <div class="checkpoint-time">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg>
+          ~5 min
+        </div>
+      </div>
+    </div>
+
+    <!-- script_step 5 -->
+    <div class="script_step-card">
+      <div class="script_step-card-left">
+        <div class="script_step-card-header">
+          <div class="script_step-card-num">5</div>
+          <div class="script_step-card-num-block">
+            <div class="script_step-card-subtitle">script_step 5</div>
+            <h2 class="script_step-card-title">喂入产品 → 课程预览</h2>
+          </div>
+        </div>
+        <div class="io-row">
+          <div class="io-label">Input</div>
+          <div class="io-content">
+            <span class="file">v0.5_mission_spec.json</span>
+          </div>
+        </div>
+        <div class="io-row">
+          <div class="io-label">Output</div>
+          <div class="io-content">
+            课程在 web 端完整跑通
+          </div>
+        </div>
+      </div>
+      <div class="checkpoint-box">
+        <div class="checkpoint-label">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg>
+          Checkpoint 5
+        </div>
+        <p class="checkpoint-desc">实际跑课程的体验：教学节奏是否流畅 + 资产（音频/图片/视频）是否齐全 + component 行为是否符合预期。</p>
+        <div class="checkpoint-time">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg>
+          ~30 min
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- MASTER DATA -->
+  <div class="master-section">
+    <div class="master-header">
+      <h2>主数据（跨 mission 复用）</h2>
+      <p>这两份是 pipeline 的"参考书"，不随单个 mission 变，所有 mission 共享。</p>
+    </div>
+    <div class="master-grid">
+      <div class="master-item">
+        <div class="master-icon">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="18" height="18"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M9 9h6M9 13h6M9 17h4"/></svg>
+        </div>
+        <div>
+          <div class="master-item-title">组件清单</div>
+          <div class="master-item-desc">component_catalog.json · 37 components</div>
+        </div>
+      </div>
+      <div class="master-item">
+        <div class="master-icon">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="18" height="18"><path d="M3 3h7v7H3zM14 3h7v7h-7zM14 14h7v7h-7zM3 14h7v7H3z"/></svg>
+        </div>
+        <div>
+          <div class="master-item-title">Phase ↔ Component 映射</div>
+          <div class="master-item-desc">phase_component_eligibility_v0.2.md</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="footer">
+    <span>Pipeline Design v0.1 · 2026-08-04</span>
+    <span class="footer-tag">Mavis</span>
+  </div>
+
+</div>
+</body>
+</html>
