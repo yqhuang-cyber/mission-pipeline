@@ -303,6 +303,51 @@ describe('N3 Kai speech + knowledge from v0.2', () => {
     expect(sanitizeKaiSpeech('Nice – you said it.')).not.toMatch(/[—–]/)
   })
 
+  it('Kai scripts drop stage directions and speaker labels (not TTS)', () => {
+    loadCatalogComponents()
+    expect(
+      sanitizeKaiSpeech('你是哪国人？ Kai shows Tom. Kai: You can ask too.'),
+    ).toBe('你是哪国人？ You can ask too.')
+    expect(
+      sanitizeKaiSpeech('Kai shows Emma. Kai: Emma is my friend.'),
+    ).toBe('Emma is my friend.')
+    expect(
+      sanitizeKaiSpeech('Kai asks: 她是你的朋友吗？'),
+    ).toBe('她是你的朋友吗？')
+
+    const point = buildHeuristicRow({
+      phase: 'P2',
+      scriptStep: 7,
+      scriptName: 'PRACTICE',
+      purpose: '指人说',
+      cmpId: 'CMP-35',
+      outline:
+        '指人说「他是英国人」: Kai shows Tom. Kai: Tom is from the UK. Say it. Student: 他是英国人。',
+      indexInStep: 1,
+      totalInStep: 4,
+      activityTitle: '指人说「他是英国人」',
+    })
+    expect(point['Kai Script 1']).toMatch(/Tom is from the UK/)
+    expect(point['Kai Script 1']).not.toMatch(/Kai shows|Kai:/i)
+    expect(point['Kai Script 1']).not.toMatch(/Student:/i)
+
+    const migrate = buildHeuristicRow({
+      phase: 'P2',
+      scriptStep: 8,
+      scriptName: 'TRANSFER',
+      purpose: '迁移问国籍',
+      cmpId: 'CMP-15',
+      outline:
+        '迁移：用他/她问国籍: **Screen:** 你是哪国人？ Kai shows Tom. Kai: You can ask too. But what if we ask about him? Screen: 他是___？',
+      indexInStep: 1,
+      totalInStep: 1,
+      activityTitle: '迁移：用他/她问国籍',
+    })
+    expect(migrate['Kai Script 1']).toMatch(/You can ask too|ask about him/i)
+    expect(migrate['Kai Script 1']).not.toMatch(/Kai shows/i)
+    expect(migrate['Kai Script 1']).not.toMatch(/\bKai\s*:/i)
+  })
+
   it('CMP-33 观后理解: Script1=atmosphere, Script2=tap prompt, Transition=closing', () => {
     loadCatalogComponents()
     const row = buildHeuristicRow({
@@ -417,6 +462,7 @@ We'll come back to it.`,
     expect(say.DisplayText).toMatch(/【汉字】\s*她是我的朋友/)
     expect(say.DisplayText).not.toMatch(/对不起/)
     expect(say['Kai Script 1']).toMatch(/Emma is my friend/)
+    expect(say['Kai Script 1']).not.toMatch(/Kai shows|Kai:/i)
     expect(say['Kai Script 2']).toMatch(/她是我的朋友/)
   })
 

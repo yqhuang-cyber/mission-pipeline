@@ -876,4 +876,35 @@ Goal
       expect(c11.rationale).toMatch(/不适合|对话|扮演/)
     }
   })
+
+  it('8.1 迁移问句 + Choices → CMP-13 (not role-play CMP-15)', () => {
+    const md = `# Mission
+## Phase 2 — Knowledge Discovery
+### script_step 8. DISCOVERY — ASK ABOUT HIM / HER
+> 教学目的: 发现第三人称疑问句构成
+> 建议 component: CMP-13, CMP-12
+
+**Screen:** 你是哪国人？
+Kai shows Tom.
+Kai: You can ask too. But what if we ask about him?
+**Screen:** 他是___？
+**Choices:**
+A. 他是哪国人？
+B. 他叫什么名字？
+C. 他是老师吗？
+Student selects: 他是哪国人？
+Kai: Exactly. 他是哪国人？
+Then show Emma.
+Kai: Now ask about her.
+`
+    const doc = analyzeActivitiesFromPhased('Test', md)
+    const step8 = doc.steps.find((s) => s.scriptStep === 8)!
+    expect(step8).toBeTruthy()
+    const act = step8.activities.find((a) => /迁移/.test(a.title))!
+    expect(act).toBeTruthy()
+    expect(act.selectedComponentId).toBe('CMP-13')
+    expect(act.candidates[0]!.id).toBe('CMP-13')
+    expect(act.selectionThinking).toMatch(/焦点|知识点|CMP-13/)
+    expect(act.selectionThinking).not.toMatch(/角色扮演/)
+  })
 })

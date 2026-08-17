@@ -112,6 +112,11 @@ function detectActivityNeed(
   text: string,
   purpose: string,
 ): ActivityNeed {
+  const hasMcq =
+    /Choices:|Student\s+chooses|Student\s+selects|Student\s*choices?|选项/i.test(
+      text,
+    )
+
   // Trust pedagogical titles after naming (strongest signal)
   if (/对比已学|对比两句|并排观察/i.test(title)) return 'contrast_sentences'
   if (/听辨练习/i.test(title)) {
@@ -124,14 +129,19 @@ function detectActivityNeed(
       ? 'meaning_choice_focus'
       : 'meaning_choice_direct'
   }
-  // 单元意图可以是「发现规律」，但本活动若已是「标出语素 + 单选」，按选择题走
-  if (
-    /Choices:|Student\s+chooses|选项/i.test(text) &&
-    hasFocusLemma(title, text)
-  ) {
+  // 活动形态优先：正文已是选择题时，不要被「迁移 / 对话」标题盖成角色扮演
+  if (hasMcq && hasFocusLemma(title, text)) {
     return 'meaning_choice_focus'
   }
-  if (/探索「|发现「的」/i.test(title) && /Choices:|Student\s+chooses|选项/i.test(text)) {
+  if (
+    hasMcq &&
+    (/迁移：|他是___|她是___|ask about him|ask about her/i.test(title) ||
+      /他是___|她是___|ask about him|ask about her/i.test(text))
+  ) {
+    // 他是___？ + 中文问句选项：焦点在第三人称迁移（历史/CD 用 CMP-13）
+    return 'meaning_choice_focus'
+  }
+  if (hasMcq && /探索「|发现「的」/i.test(title)) {
     return 'meaning_choice_focus'
   }
   if (/情境回放|观看开场|例证输入/i.test(title)) return 'watch'
@@ -146,7 +156,8 @@ function detectActivityNeed(
   if (/指人说/i.test(title)) return 'prompted_say'
   if (/对话练习|角色扮演/i.test(title)) return 'dialogue'
   if (/综合练习/i.test(title) && isRolePlaySet(text)) return 'dialogue'
-  if (/迁移：/i.test(title)) return 'dialogue'
+  // 「迁移」仅在没有选择题形态时才当对话；有 Choices 已在上方走 MCQ
+  if (/迁移：/i.test(title) && !hasMcq) return 'dialogue'
   if (isRolePlaySet(text)) return 'dialogue'
   if (/发布 Mission|Mission/i.test(title)) return 'mission'
 
@@ -161,12 +172,12 @@ function detectActivityNeed(
   }
   if (
     /你叫什么名字[\s\S]*你是哪国人|你是哪国人[\s\S]*你叫什么名字/i.test(text) &&
-    !/Student chooses|Choices:|Listen and choose/i.test(text) &&
+    !hasMcq &&
     !isRolePlaySet(text)
   ) {
     return 'contrast_sentences'
   }
-  if (/Choices:|Student\s+chooses|单项选择/i.test(hay)) {
+  if (hasMcq) {
     return hasFocusLemma(title, text)
       ? 'meaning_choice_focus'
       : 'meaning_choice_direct'
@@ -1863,7 +1874,17 @@ function scoreCandidates(
     ;['CMP-15', 'CMP-19'].forEach((id, i) =>
       bump(id, 18 - i * 8, '活动类型：角色扮演综合练习'),
     )
-  } else if (/对话练习|迁移：/i.test(chunk.title)) {
+  } else if (
+    /迁移：/i.test(chunk.title) &&
+    /Choices:|Student\s+chooses|Student\s+selects|选项/i.test(chunk.text || '')
+  ) {
+    ;['CMP-13', 'CMP-33', 'CMP-02'].forEach((id, i) =>
+      bump(id, 16 - i * 4, '活动类型：迁移问句选择（有选项）'),
+    )
+  } else if (
+    /对话练习|迁移：/i.test(chunk.title) &&
+    !/Choices:|Student\s+chooses|Student\s+selects|选项/i.test(chunk.text || '')
+  ) {
     ;['CMP-15', 'CMP-19'].forEach((id, i) =>
       bump(id, 10 - i, '活动类型：对话'),
     )

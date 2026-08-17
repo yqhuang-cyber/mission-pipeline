@@ -20,16 +20,43 @@ import type { NodeEngineResult } from './n1.js'
 
 /**
  * Kai 口播禁「— / –」：模板曾用它当英文停顿或词条分隔，TTS 会读坏或卡顿。
- * 统一改成句号停顿；DisplayText / Step 标题不受此限。
+ * 并清掉舞台说明 / 说话人标签（Kai shows…、Kai:、Student:），只留老师要念的话。
  */
 export function sanitizeKaiSpeech(text: string): string {
   if (!text) return text
-  return text
+  let t = text
+  // Stage business — never voiced
+  t = t.replace(
+    /\b(?:Then\s+)?Kai\s+(?:shows|points(?:\s+to)?|looks\s+at|gestures\s+(?:to|at)|holds\s+up|presents)\s+[^.?!。？\n]{1,40}[.?!。？]?\s*/gi,
+    '',
+  )
+  t = t.replace(
+    /\b(?:Emma|Tom|Anna|Jayden|Friend\s*\d+)\s+walks?\s+over\.?\s*/gi,
+    '',
+  )
+  t = t.replace(
+    /\bStudent\s+(?:taps?|chooses?|selects?|builds?|answers?|repeats?|says)\b[^.?!。？\n]{0,60}[.?!。？]?\s*/gi,
+    '',
+  )
+  t = t.replace(
+    /\b(?:Then\s+)?(?:show|shows)\s+(?:Tom|Emma|Anna|Jayden|unknown\s+student)\b[^.?!。？\n]{0,20}[.?!。？]?\s*/gi,
+    '',
+  )
+  // Speaker / prompt labels (keep the uttered words after the colon)
+  t = t.replace(/\bKai\s+asks?(?:\s+student)?\s*[:：]\s*/gi, '')
+  t = t.replace(/\bKai\s*[:：]\s*/gi, '')
+  t = t.replace(/\bStudent\s*[:：]\s*[^\n.?!。？]{0,40}[.?!。？]?\s*/gi, '')
+  t = t.replace(/\b(?:On\s*)?Screen\s*[:：]\s*/gi, '')
+  t = t.replace(/\bHighlight\s*[:：]\s*/gi, '')
+  // Em dashes → period pause
+  t = t
     .replace(/\s*[—–]+\s*/g, '. ')
     .replace(/\.\s*\./g, '.')
     .replace(/\s{2,}/g, ' ')
     .replace(/^\.\s*/, '')
+    .replace(/\s+([.?!。？])/g, '$1')
     .trim()
+  return t
 }
 
 function withKaiSpeechSanitized(row: N3Row): N3Row {
@@ -417,11 +444,50 @@ function isCharacterDialogue(s: string): boolean {
   return /^[A-Za-z\u4e00-\u9fff]{1,12}\s*[：:]\s*\S/.test(s.trim())
 }
 
+function stripSpeakerLabel(s: string): string {
+  return s
+    .replace(/^\*{0,2}Kai\*{0,2}\s+asks?(?:\s+student)?\s*[:：]?\s*/i, '')
+    .replace(/^\*{0,2}Kai\*{0,2}\s*[:：]\s*/i, '')
+    .replace(/^\*{0,2}(?:On\s*)?Screen\*{0,2}\s*[:：]\s*/i, '')
+    .trim()
+}
+
 function isStageDirection(s: string): boolean {
-  const t = s.trim()
-  if (/^(Mission\s*\d+|opening story|Video plays|Video ends|Freeze|Replay)\b/i.test(t)) {
+  const t = stripSpeakerLabel(s.trim())
+  if (!t) return true
+  if (
+    /^(Mission\s*\d+|opening story|Video plays|Video ends|Freeze|Replay)\b/i.test(
+      t,
+    )
+  ) {
     return true
   }
+  // Director notes — Kai must not voice these
+  if (
+    /^(?:Then\s+)?Kai\s+(?:shows|points(?:\s+to)?|looks\s+at|gestures\s+(?:to|at)|holds\s+up|presents)\b/i.test(
+      s.trim(),
+    )
+  ) {
+    return true
+  }
+  if (
+    /^(?:Then\s+)?(?:show|shows)\s+(?:Tom|Emma|Anna|Jayden|unknown\s+student)\b/i.test(
+      t,
+    )
+  ) {
+    return true
+  }
+  if (
+    /^Student\s+(?:taps?|chooses?|selects?|builds?|answers?|repeats?|says)\b/i.test(
+      t,
+    )
+  ) {
+    return true
+  }
+  if (/^(?:On\s*)?Screen\b|^Highlight\b|^Choices\b|^Audio\b/i.test(s.trim())) {
+    return true
+  }
+  if (/^(Emma|Tom|Anna|Jayden)\s+walks?\b/i.test(t)) return true
   // Narrative stage business without teacher framing
   if (
     /走过来|看向|指向|学生们|Video\b/i.test(t) &&
@@ -435,22 +501,29 @@ function isStageDirection(s: string): boolean {
 }
 
 function isSpokenTeacherLine(s: string): boolean {
-  const t = s.trim()
+  const raw = s.trim()
+  if (!raw || raw.length < 2) return false
+  if (isCharacterDialogue(raw) || isStageDirection(raw)) return false
+  const t = stripSpeakerLabel(raw)
   if (!t || t.length < 2) return false
-  if (isCharacterDialogue(t) || isStageDirection(t)) return false
+  if (isStageDirection(t)) return false
   if (META_SPEECH_BLOCK.test(t) && !/[a-zA-Z]{3,}/.test(t)) return false
   if (/^[\u4e00-\u9fff]{2,8}$/.test(t) && META_SPEECH_BLOCK.test(t)) return false
   if (/^(A|B|C|D)[\).:\s]/i.test(t)) return false
   if (/^✓/.test(t)) return false
   if (/YOUR MISSION|By the end of this mission/i.test(t)) return false
   // Prefer lines that look like teacher talk (EN or mixed CN dialogue cue)
-  if (/^[A-ZА-Я]/.test(t) || /[.!?？。]$/.test(t) || /\[User Name\]/i.test(t)) {
+  if (/^[A-ZА-Я\u4e00-\u9fff]/.test(t) || /[.!?？。]$/.test(t) || /\[User Name\]/i.test(t)) {
     // Avoid captions like "Mission 4: …"
     if (/^Mission\s*\d+/i.test(t)) return false
+    // Bare "Kai shows…" already filtered; remaining "Kai …" stage verbs
+    if (/^Kai\s+(shows|points|looks|gestures|holds|presents)\b/i.test(t)) {
+      return false
+    }
     return true
   }
   if (
-    /welcome|watch|listen|ready|notice|today|friend|country|turn|choose|tap|look|exactly|hmm|keep|come back|first|now|your|let'?s|how many|what is/i.test(
+    /welcome|watch|listen|ready|notice|today|friend|country|turn|choose|tap|look|exactly|hmm|keep|come back|first|now|your|let'?s|how many|what is|say it|ask about/i.test(
       t,
     )
   ) {
@@ -468,19 +541,22 @@ export function extractSpokenChunks(outline: string): string[] {
   const raw = (outline || '').replace(/\r/g, '')
   const chunks: string[] = []
 
-  // Prefer explicit Kai blocks
+  // Prefer explicit Kai blocks (allow mid-line `Kai:` — outlines are often flat)
   const kaiBlocks = [
     ...raw.matchAll(
-      /\*\*Kai:\*\*\s*([\s\S]*?)(?=\*\*[A-Za-z]|Student choices|YOUR MISSION|Screen:|Video plays|---|$)/gi,
+      /\*\*Kai:\*\*\s*([\s\S]*?)(?=\*\*[A-Za-z]|Student choices|YOUR MISSION|Screen:|Video plays|Kai shows|---|$)/gi,
+    ),
+    ...raw.matchAll(
+      /(?:^|[\n\s]|[*])Kai\s*[：:]\s*([^*\n]+?)(?=\s*(?:\*{0,2}(?:Student|Kai\s*[：:]|Screen|Choices|Highlight|Friend|Then\s+Kai\s+shows|Kai\s+shows)\b)|\*{2}|$)/gi,
     ),
     ...raw.matchAll(
       /(?:^|\n)Kai\s*[：:]\s*([\s\S]*?)(?=\n(?:Emma|Tom|Jayden|Student|On\s*Screen|Kai|Friend|---)\b|$)/gi,
     ),
   ]
   for (const kb of kaiBlocks) {
-    const body = stripOutlineChrome(kb[1] || '')
+    const body = stripOutlineChrome(stripSpeakerLabel(kb[1] || ''))
     for (const part of body.split(/(?<=[.!?。？])\s+/)) {
-      const p = part.trim()
+      const p = stripSpeakerLabel(part.trim())
       if (isSpokenTeacherLine(p)) chunks.push(p)
     }
   }
@@ -488,7 +564,7 @@ export function extractSpokenChunks(outline: string): string[] {
   if (!chunks.length) {
     const cleaned = stripOutlineChrome(raw)
     for (const part of cleaned.split(/(?<=[.!?。？])\s+/)) {
-      const p = part.trim()
+      const p = stripSpeakerLabel(part.trim())
       if (isSpokenTeacherLine(p)) chunks.push(p)
     }
   }
@@ -1354,6 +1430,7 @@ const N3_SYSTEM = `你是中文教学 Mission Pipeline 的 N3（Content 填充�
 - 填 DisplayText 时按 **组件类型** 解析 outline（选择题≠学习目标≠视频叠字）；对照 F 示例 chrome 与 M 设计规范；选项/答案语义正确（单选答案仅一字母）
 - Display Image / Video Play 从 catalog N/O 列带出默认值（不需要媒体写 NA；需要则写前端字段名+TBC）；不要改成空字符串
 - Kai Script 1/2、Feedback、Transition Script 必须是 Kai 老师口播（可中英混），禁止组件名/教学目的/「视频播放」等标注；姓名用 [User Name]
+- 口播里禁止舞台说明与说话人标签：不要写「Kai shows Tom」「Kai:」「Student:」「Screen:」；只写 Kai 要念出来的句子
 - 口播里禁止使用破折号「—」或「–」（TTS 会读坏）；停顿用句号或逗号
 - 有学生作答互动才填 Script 2 / Feedback；纯观看/继续按钮则 Script2+Feedback 留空
 - Knowledge point 只从 v0.2 元信息知识点库中挑本行 outline 实际涉及的条目，并标注类别（有则写、无则省略）：Word / Grammar / Phrase / Pattern / SocialExpression / Pinyin；禁止把整课库抄进每一步；格式如 Word: …\\nGrammar: …
