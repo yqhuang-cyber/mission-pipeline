@@ -192,18 +192,26 @@ CD 将 `TBC` 换成 objectKey（不用完整 URL）。Kai 老师头像是产品�
 
 ### 3.13 Knowledge point
 
-从 **v0.2 元信息「核心词汇 / 核心句型」** 中，挑选本步 outline 实际涉及的条目；有则写、无则省略子项：
+从 **v0.2 元信息知识点库**（整体 mission 的 Word / Grammar / Phrase / Pattern / SocialExpression / Pinyin）中，挑选本步 outline 实际涉及的条目；有则写、无则省略子项。各类均为 optional：
 
-- Word · Grammar · Phrase · Pattern · SocialExpression · Pinyin  
+- **Word** — 词汇  
+- **Grammar** — 语法点（如助词「的」）  
+- **Phrase** — 短语 / 词块  
+- **Pattern** — 句型  
+- **SocialExpression** — 社交 / 课堂用语  
+- **Pinyin** — 本步出现的拼音  
 
 建议单元格格式（多行亦可）：
 
 ```
 Word: 哪国 / 中国 / 美国
+Grammar: 的
+Phrase: 哪国人
 Pattern: 你是哪国人？ / 我是XX人。
+Pinyin: nǐ shì nǎ guó rén
 ```
 
-本步若无明显知识点（纯寒暄过渡），可写一行说明如 `SocialExpression: classroom rapport`，避免完全空白；**不要**把组件名或教学目的中文当成 Word。
+本步若无明显知识点（纯寒暄过渡、或 outline 未命中库内条目），**留空**即可，不要编造占位文案；**不要**把组件名或教学目的中文当成 Word；**不要**把整课知识点库抄进每一步。`SocialExpression` 仅在本步真的教/练库里的社交表达时使用。
 
 ---
 

@@ -436,10 +436,11 @@ We'll come back to it.`,
       '欢迎并发布任务：感知哪国人、朋友等全部核心词汇句型',
       knowledge,
     )
-    expect(warm).toMatch(/朋友|SocialExpression/)
+    expect(warm).toMatch(/Word:\s*朋友/)
     expect(warm).not.toMatch(/你是哪国人/)
     expect(warm).not.toMatch(/Word:.*人\b/)
     expect(warm).not.toMatch(/她\/他是你的朋友吗/)
+    expect(warm).not.toMatch(/classroom rapport/)
 
     // Name-focus listen activity: only name-related hits, not every country pattern
     const nameOnly = extractKnowledgePoint(
@@ -449,6 +450,82 @@ We'll come back to it.`,
     )
     expect(nameOnly).not.toMatch(/你是哪国人/)
     expect(nameOnly).not.toMatch(/中国|美国|英国/)
+    // Pure greeting with no bank hits → empty (no fake SocialExpression)
+    expect(
+      extractKnowledgePoint('Hello! Welcome back.', '课前寒暄', knowledge),
+    ).toBe('')
+  })
+
+  it('5.5 发现构词规律 focuses Word 人 (not classroom rapport)', () => {
+    const knowledge = parseMissionKnowledge(`
+## 元信息
+- **核心词汇**:
+  - 人 (person)
+  - 英国 (UK)
+  - 中国 (China)
+- **核心句型**:
+  - 你是哪国人？ (Where are you from?)
+`)
+    const kp = extractKnowledgePoint(
+      '发现构词规律: Kai: What do you notice? Student taps 人. Highlight: 人 Kai: What do you think 人 is doing here? Choices: A. Asking a question B. Talking about a person from that country',
+      '发现"国家+人"构词规律',
+      knowledge,
+    )
+    expect(kp).toMatch(/Word:\s*人/)
+    expect(kp).not.toMatch(/classroom rapport/)
+    expect(kp).not.toMatch(/Pattern:\s*你是哪国人/)
+  })
+
+  it('Knowledge point uses mission bank categories Word/Grammar/Phrase/Pattern/Pinyin', () => {
+    const knowledge = parseMissionKnowledge(`
+## 元信息
+- **核心词汇**:
+  - 哪国 (which country)
+  - 朋友 (friend)
+  - 的 (possessive particle)
+  - 我的 (my)
+- **核心短语**:
+  - 哪国人 (person from which country)
+- **核心句型**:
+  - 你是哪国人？ (Where are you from?)
+- **拼音**:
+  - nǐ shì nǎ guó rén (你是哪国人)
+`)
+    expect(knowledge.words.map((w) => w.zh)).toEqual(
+      expect.arrayContaining(['哪国', '朋友', '我的']),
+    )
+    expect(knowledge.grammar.map((g) => g.zh)).toEqual(
+      expect.arrayContaining(['的']),
+    )
+    expect(knowledge.phrases.map((p) => p.zh)).toEqual(
+      expect.arrayContaining(['哪国人']),
+    )
+    expect(knowledge.patterns.map((p) => p.zh)).toEqual(
+      expect.arrayContaining(['你是哪国人？']),
+    )
+    expect(knowledge.pinyin.map((p) => p.zh)).toEqual(
+      expect.arrayContaining(['nǐ shì nǎ guó rén']),
+    )
+
+    const deFocus = extractKnowledgePoint(
+      'Highlight: 的\nWhat do you think 的 is doing?\n我的 你的',
+      '发现的',
+      knowledge,
+    )
+    expect(deFocus).toMatch(/Grammar:\s*的/)
+    expect(deFocus).toMatch(/Word:\s*.*我的/)
+    expect(deFocus).not.toMatch(/Pattern:\s*你是哪国人/)
+
+    const askCountry = extractKnowledgePoint(
+      'Audio: 你是哪国人？\nnǐ shì nǎ guó rén\nWhat is the teacher trying to find out?',
+      '理解问句',
+      knowledge,
+    )
+    expect(askCountry).toMatch(/Word:\s*哪国/)
+    expect(askCountry).toMatch(/Phrase:\s*哪国人/)
+    expect(askCountry).toMatch(/Pattern:\s*你是哪国人？/)
+    expect(askCountry).toMatch(/Pinyin:\s*nǐ shì nǎ guó rén/)
+    expect(askCountry).not.toMatch(/Grammar:\s*的/)
   })
 })
 

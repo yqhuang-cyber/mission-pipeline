@@ -211,46 +211,148 @@ export function buildStepLabel(
   return base.slice(0, 80)
 }
 
+export type KnowledgeItem = { zh: string; gloss: string }
+
 export type MissionKnowledge = {
-  words: Array<{ zh: string; gloss: string }>
-  patterns: Array<{ zh: string; gloss: string }>
+  words: KnowledgeItem[]
+  grammar: KnowledgeItem[]
+  phrases: KnowledgeItem[]
+  patterns: KnowledgeItem[]
+  socialExpressions: KnowledgeItem[]
+  pinyin: KnowledgeItem[]
 }
 
-/** Parse 核心词汇 / 核心句型 from v0.2 元信息 */
+const EMPTY_KNOWLEDGE = (): MissionKnowledge => ({
+  words: [],
+  grammar: [],
+  phrases: [],
+  patterns: [],
+  socialExpressions: [],
+  pinyin: [],
+})
+
+function pushItem(target: KnowledgeItem[], zh: string, gloss = '') {
+  const z = zh.trim()
+  if (!z) return
+  if (target.some((t) => t.zh === z)) return
+  target.push({ zh: z, gloss: gloss.trim() })
+}
+
+function parseKnowledgeLine(raw: string): { zh: string; gloss: string } | null {
+  const line = raw.trim()
+  if (!line) return null
+  const gm =
+    /^([\u4e00-\u9fffA-Za-z0-9／/·.，,？?！!…āáǎàēéěèīíǐìōóǒòūúǔùǖǘǚǜü\s]+?)\s*[（(]\s*([^）)]+)\s*[）)]\s*$/.exec(
+      line,
+    ) || /^(.+?)\s+[—–-]\s+(.+)$/.exec(line)
+  if (gm) return { zh: gm[1]!.trim(), gloss: gm[2]!.trim() }
+  return { zh: line, gloss: '' }
+}
+
+function isGrammarLemma(zh: string, gloss: string): boolean {
+  if (/助词|particle|语法|grammar|结构助|语气助/i.test(gloss)) return true
+  return /^(的|吗|呢|了|着|过|吧|啊|呀|嘛)$/.test(zh)
+}
+
+function isPinyinToken(zh: string): boolean {
+  return /^[a-zāáǎàēéěèīíǐìōóǒòūúǔùǖǘǚǜü\s']+$/i.test(zh) && /[aeiouüǔūúùāáǎàēéěèīíǐìōóǒò]/i.test(zh)
+}
+
+/** Parse mission KP bank from v0.2 元信息 (Word/Grammar/Phrase/Pattern/SocialExpression/Pinyin). */
 export function parseMissionKnowledge(phasedMd: string): MissionKnowledge {
-  const words: MissionKnowledge['words'] = []
-  const patterns: MissionKnowledge['patterns'] = []
-  if (!phasedMd) return { words, patterns }
+  const out = EMPTY_KNOWLEDGE()
+  if (!phasedMd) return out
 
-  const vocabBlock =
-    /核心词汇[\s\S]*?(?=核心句型|\*\*\s*角色|角色\s*:|# Phase|\n---\s*\n|$)/i.exec(
-      phasedMd,
-    )?.[0] || ''
-  const patternBlock =
-    /核心句型[\s\S]*?(?=\*\*\s*角色|角色\s*:|# Phase|\n---\s*\n|$)/i.exec(
-      phasedMd,
-    )?.[0] || ''
+  const section = (names: string[]): string => {
+    const alt = names.map(escapeReg).join('|')
+    const re = new RegExp(
+      `(?:\\*\\*)?(?:${alt})(?:\\*\\*)?[：:][\\s\\S]*?(?=\\n\\s*-\\s*\\*\\*[^*]+\\*\\*|\\n\\s*-\\s*(?:核心|Grammar|Phrase|Pattern|Social|Pinyin|角色)|# Phase|\\n---\\s*\\n|$)`,
+      'i',
+    )
+    return re.exec(phasedMd)?.[0] || ''
+  }
 
-  const lineRe = /^\s*[-*]\s*(.+)$/gm
-  for (const block of [vocabBlock, patternBlock]) {
-    const target = block === vocabBlock ? words : patterns
-    let m: RegExpExecArray | null
-    const re = new RegExp(lineRe)
-    while ((m = re.exec(block))) {
-      const raw = (m[1] || '').trim()
-      if (!raw || /核心词汇|核心句型/.test(raw)) continue
-      const gm =
-        /^([\u4e00-\u9fffA-Za-z0-9／/·.，,？?！!…\s]+?)\s*[（(]\s*([^）)]+)\s*[）)]\s*$/.exec(
-          raw,
-        ) || /^(.+?)\s+[—–-]\s+(.+)$/.exec(raw)
-      if (gm) {
-        target.push({ zh: gm[1]!.trim(), gloss: gm[2]!.trim() })
-      } else if (/[\u4e00-\u9fff]/.test(raw)) {
-        target.push({ zh: raw, gloss: '' })
+  const collectFromBlock = (
+    block: string,
+    sink: (zh: string, gloss: string) => void,
+  ) => {
+    if (!block) return
+    // Inline slash list on the header line: 核心词汇: 哪国 / 中国
+    const headerInline =
+      /^[^\n]*[：:]\s*(.+)$/m.exec(block)?.[1]?.trim() || ''
+    if (headerInline && !/^[-\*]\s/.test(headerInline)) {
+      for (const part of headerInline.split(/\s*\/\s*/)) {
+        const item = parseKnowledgeLine(part)
+        if (item) sink(item.zh, item.gloss)
       }
     }
+    const lineRe = /^\s*[-*]\s*(.+)$/gm
+    let m: RegExpExecArray | null
+    while ((m = lineRe.exec(block))) {
+      const raw = (m[1] || '').trim()
+      if (!raw || /核心词汇|核心句型|核心短语|核心语法|拼音|Grammar|Phrase|Pattern|Social|Pinyin|角色/.test(raw)) {
+        continue
+      }
+      const item = parseKnowledgeLine(raw)
+      if (item) sink(item.zh, item.gloss)
+    }
   }
-  return { words, patterns }
+
+  // Explicit category sections (optional, preferred when present)
+  collectFromBlock(section(['Grammar', '核心语法', '语法点']), (zh, gloss) =>
+    pushItem(out.grammar, zh, gloss),
+  )
+  collectFromBlock(section(['Phrase', '核心短语', '短语']), (zh, gloss) =>
+    pushItem(out.phrases, zh, gloss),
+  )
+  collectFromBlock(
+    section(['SocialExpression', '社交表达', '交际表达']),
+    (zh, gloss) => pushItem(out.socialExpressions, zh, gloss),
+  )
+  collectFromBlock(section(['Pinyin', '拼音']), (zh, gloss) => {
+    if (isPinyinToken(zh) || /[a-zāáǎà]/i.test(zh)) pushItem(out.pinyin, zh, gloss)
+    else pushItem(out.pinyin, zh, gloss)
+  })
+  collectFromBlock(section(['Pattern', '核心句型', '句型']), (zh, gloss) =>
+    pushItem(out.patterns, zh, gloss),
+  )
+  collectFromBlock(section(['Word', '核心词汇', '词汇']), (zh, gloss) => {
+    if (isGrammarLemma(zh, gloss)) pushItem(out.grammar, zh, gloss)
+    else if (isPinyinToken(zh)) pushItem(out.pinyin, zh, gloss)
+    else pushItem(out.words, zh, gloss)
+  })
+
+  // Fallback: classic 核心词汇 / 核心句型 if Word/Pattern empty
+  if (!out.words.length && !out.grammar.length) {
+    collectFromBlock(section(['核心词汇']), (zh, gloss) => {
+      if (isGrammarLemma(zh, gloss)) pushItem(out.grammar, zh, gloss)
+      else pushItem(out.words, zh, gloss)
+    })
+  }
+  if (!out.patterns.length) {
+    collectFromBlock(section(['核心句型']), (zh, gloss) =>
+      pushItem(out.patterns, zh, gloss),
+    )
+  }
+
+  // 词汇清单 table rows (中文 | 英文)
+  const table =
+    /##\s*词汇清单[\s\S]*?(?=\n#\s|---|##\s*Phase|$)/i.exec(phasedMd)?.[0] || ''
+  for (const m of table.matchAll(
+    /^\|\s*([\u4e00-\u9fff]{1,12})\s*\|\s*([^|]+)\|/gm,
+  )) {
+    const zh = m[1]!.trim()
+    const gloss = m[2]!.trim()
+    if (/^中文$/.test(zh)) continue
+    if (isGrammarLemma(zh, gloss)) pushItem(out.grammar, zh, gloss)
+    else if (zh.length >= 3 && /人$/.test(zh) && zh !== '人') {
+      pushItem(out.phrases, zh, gloss)
+    } else {
+      pushItem(out.words, zh, gloss)
+    }
+  }
+
+  return out
 }
 
 /** Drop N2 outline chrome: "视频播放: …", markdown labels, stage notes */
@@ -459,6 +561,51 @@ function splitPostWatchMcqTimeline(outline: string): {
   }
 }
 
+function hitBankItems(
+  items: KnowledgeItem[],
+  src: string,
+  opts: { allowShortZh?: boolean; max?: number } = {},
+): string[] {
+  const { allowShortZh = false, max = 4 } = opts
+  const hits: string[] = []
+  const sorted = [...items].sort((a, b) => b.zh.length - a.zh.length)
+  for (const item of sorted) {
+    if (!item.zh) continue
+    if (!allowShortZh && item.zh.length <= 1) continue
+    if (src.includes(item.zh)) {
+      hits.push(item.zh)
+      continue
+    }
+    if (item.gloss) {
+      const glossToken = item.gloss.split(/[/,;]| or /i)[0]!.trim()
+      if (
+        glossToken.length >= 4 &&
+        new RegExp(`\\b${escapeReg(glossToken)}\\b`, 'i').test(src)
+      ) {
+        hits.push(item.zh)
+      }
+    }
+  }
+  return [...new Set(hits)].slice(0, max)
+}
+
+/** 1-char bank items (人 / 的) only when the outline focuses that lemma. */
+function lemmaFocusedInOutline(zh: string, src: string): boolean {
+  if (zh.length > 1) return src.includes(zh)
+  const esc = escapeReg(zh)
+  // Do not use \\b around CJK — JS word boundaries ignore Han characters.
+  const notHan = `[^\\u4e00-\\u9fff]`
+  return (
+    new RegExp(
+      `(?:Highlight|Focus|发现|强调|看一看|Student taps?)\\s*[:：]?\\s*${esc}(?=${notHan}|$)`,
+      'i',
+    ).test(src) ||
+    new RegExp(`${esc}\\s+is\\s+(?:doing|for|a)\\b`, 'i').test(src) ||
+    new RegExp(`\\bwhat\\s+.+${esc}(?=${notHan}|$)`, 'i').test(src) ||
+    new RegExp(`(?:^|\\n)\\s*${esc}\\s*(?:\\n|$)`).test(src)
+  )
+}
+
 export function extractKnowledgePoint(
   outline: string,
   _purpose: string,
@@ -468,23 +615,21 @@ export function extractKnowledgePoint(
   // which is shared by every component under the step and over-fills KP.
   const src = stripOutlineChrome(outline || '')
   const lines: string[] = []
-  const words = knowledge?.words || []
-  const patterns = knowledge?.patterns || []
+  const bank = knowledge || EMPTY_KNOWLEDGE()
 
   const hitWords: string[] = []
-  // Longer lemmas first so 「我的」wins over bare 「的」
-  const sortedWords = [...words].sort((a, b) => b.zh.length - a.zh.length)
-  for (const w of sortedWords) {
+  for (const w of [...bank.words].sort((a, b) => b.zh.length - a.zh.length)) {
     if (!w.zh) continue
-    // 1-char bank items (人 / 的) match almost every CN sentence — skip bare includes
-    if (w.zh.length <= 1) continue
+    if (w.zh.length <= 1) {
+      if (lemmaFocusedInOutline(w.zh, src)) hitWords.push(w.zh)
+      continue
+    }
     if (src.includes(w.zh)) {
       hitWords.push(w.zh)
       continue
     }
     if (w.gloss) {
       const glossToken = w.gloss.split(/[/,;]| or /i)[0]!.trim()
-      // gloss tokens must be specific enough (avoid "person" / "of")
       if (
         glossToken.length >= 4 &&
         new RegExp(`\\b${escapeReg(glossToken)}\\b`, 'i').test(src)
@@ -493,36 +638,49 @@ export function extractKnowledgePoint(
       }
     }
   }
-  // Country English → mission vocab (only when that country lemma is in the bank)
-  if (/China|Chinese/i.test(src) && words.some((w) => w.zh === '中国')) {
+  // Country / friend English → mission vocab (only when lemma is in the bank)
+  if (/China|Chinese/i.test(src) && bank.words.some((w) => w.zh === '中国')) {
     hitWords.push('中国')
   }
-  if (/America|American|USA|\bUS\b/i.test(src) && words.some((w) => w.zh === '美国')) {
+  if (
+    /America|American|USA|\bUS\b/i.test(src) &&
+    bank.words.some((w) => w.zh === '美国')
+  ) {
     hitWords.push('美国')
   }
   if (
     /Britain|British|\bUK\b|England/i.test(src) &&
-    words.some((w) => w.zh === '英国')
+    bank.words.some((w) => w.zh === '英国')
   ) {
     hitWords.push('英国')
   }
-  if (/\bfriends?\b/i.test(src) && words.some((w) => w.zh === '朋友')) {
+  if (/\bfriends?\b/i.test(src) && bank.words.some((w) => w.zh === '朋友')) {
     hitWords.push('朋友')
   }
   if (
     /where .+ from|which country|哪国/i.test(src) &&
-    words.some((w) => w.zh === '哪国')
+    bank.words.some((w) => w.zh === '哪国')
   ) {
     hitWords.push('哪国')
   }
-
   const uniqWords = [...new Set(hitWords)].slice(0, 4)
   if (uniqWords.length) lines.push(`Word: ${uniqWords.join(' / ')}`)
+
+  const hitGrammar: string[] = []
+  for (const g of [...bank.grammar].sort((a, b) => b.zh.length - a.zh.length)) {
+    if (!g.zh) continue
+    if (lemmaFocusedInOutline(g.zh, src)) hitGrammar.push(g.zh)
+  }
+  const uniqGrammar = [...new Set(hitGrammar)].slice(0, 3)
+  if (uniqGrammar.length) lines.push(`Grammar: ${uniqGrammar.join(' / ')}`)
+
+  const hitPhrases = hitBankItems(bank.phrases, src, { max: 3 })
+  if (hitPhrases.length) lines.push(`Phrase: ${hitPhrases.join(' / ')}`)
 
   // Patterns: only those whose form actually appears in this outline — no
   // "if word 人 hit, dump every pattern containing 人" expansion.
   const hitPatterns: string[] = []
-  for (const p of patterns) {
+  for (const p of bank.patterns) {
     if (!p.zh) continue
     if (patternMatchesOutline(p.zh, src)) {
       hitPatterns.push(normalizePatternLabel(p.zh))
@@ -531,9 +689,35 @@ export function extractKnowledgePoint(
   const uniqPat = [...new Set(hitPatterns)].slice(0, 2)
   if (uniqPat.length) lines.push(`Pattern: ${uniqPat.join(' / ')}`)
 
-  if (!lines.length) {
-    lines.push('SocialExpression: classroom rapport')
+  const hitSocial = hitBankItems(bank.socialExpressions, src, {
+    allowShortZh: true,
+    max: 3,
+  })
+  if (hitSocial.length) {
+    lines.push(`SocialExpression: ${hitSocial.join(' / ')}`)
   }
+
+  const hitPinyin: string[] = []
+  for (const p of bank.pinyin) {
+    if (!p.zh) continue
+    const needle = p.zh.trim()
+    if (src.includes(needle)) {
+      hitPinyin.push(needle)
+      continue
+    }
+    // Tone-insensitive fallback for romanization
+    const fold = (s: string) =>
+      s
+        .normalize('NFD')
+        .replace(/[\u0300-\u036f]/g, '')
+        .replace(/ü/gi, 'v')
+        .toLowerCase()
+    if (fold(src).includes(fold(needle))) hitPinyin.push(needle)
+  }
+  const uniqPy = [...new Set(hitPinyin)].slice(0, 2)
+  if (uniqPy.length) lines.push(`Pinyin: ${uniqPy.join(' / ')}`)
+
+  // No bank hits → leave empty (do not invent "SocialExpression: classroom rapport")
   return lines.join('\n')
 }
 
@@ -1172,7 +1356,7 @@ const N3_SYSTEM = `你是中文教学 Mission Pipeline 的 N3（Content 填充�
 - Kai Script 1/2、Feedback、Transition Script 必须是 Kai 老师口播（可中英混），禁止组件名/教学目的/「视频播放」等标注；姓名用 [User Name]
 - 口播里禁止使用破折号「—」或「–」（TTS 会读坏）；停顿用句号或逗号
 - 有学生作答互动才填 Script 2 / Feedback；纯观看/继续按钮则 Script2+Feedback 留空
-- Knowledge point 只写本行 outline 实际出现的 Word/Pattern（来自 v0.2 元信息库）；禁止把整课词汇/句型抄进每一步；格式 Word:/Pattern:
+- Knowledge point 只从 v0.2 元信息知识点库中挑本行 outline 实际涉及的条目，并标注类别（有则写、无则省略）：Word / Grammar / Phrase / Pattern / SocialExpression / Pinyin；禁止把整课库抄进每一步；格式如 Word: …\\nGrammar: …
 只输出 JSON 数组，每项含 keys: scriptStep(number), componentId, displayText, kaiScript1, kaiScript2, feedbackCorrect, feedbackWrong, transitionScript, knowledgePoint。
 不要输出 step 字段（Step 已由 activity 标题锁定）。
 不要 Markdown 围栏。`
@@ -1253,7 +1437,7 @@ export async function runN3(input: {
   missionName: string
   steppedMd: string
   scriptMd?: string
-  /** v0.2 phased script — 元信息核心词汇/句型 */
+  /** v0.2 phased script — 元信息知识点库（Word/Grammar/Phrase/Pattern/SocialExpression/Pinyin） */
   phasedMd?: string
   /**
    * Optional activity titles keyed by `scriptStep.seq` (1-based component index),
