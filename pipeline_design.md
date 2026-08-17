@@ -142,7 +142,7 @@ Mission Spec (v0.5.xlsx)
 **硬约束**（必须 100% 通过）:
 - component ∈ phase allowed
 - P1 ⊇ CMP-04；P4 ⊇ CMP-21|CMP-26；P3 有 CMP-19 ⇒ 有 CMP-18
-- CMP-13 在 P1 仅短题干「含义推断」；**题干较长的传统单选用 CMP-33（P1+P2）**；CMP-02 不入 P1；CMP-15 仅 P2；CMP-22 仅 P4
+- 选择题：有要放大的焦点词/语素用 **CMP-13**（左侧【焦点】框）；直接理解题（无焦点词，如「老师在问什么」）用 **CMP-33**；CMP-02 不入 P1；CMP-15 仅 P2；CMP-22 仅 P4
 - 1 script_step 选 1–N component，N 建议 ≤ 5
 - **N>1 时 Content outline 必须按 component 切分（可少量冗余，不可整段同文）**
 
@@ -153,13 +153,13 @@ Mission Spec (v0.5.xlsx)
 **输入**:
 - v0.3_step_component_map.md
 - 原 v0.1 script（可选，增强 Kai 语气）
-- `mission_phase_step_meta_model.md`（v0.4.4）+ `mission_spec_schema.csv`（13 列）+ `component_catalog`（E/F/J/K/L）
+- `mission_phase_step_meta_model.md`（v0.4.5）+ `mission_spec_schema.csv`（13 列）+ `component_catalog`（E/F/J/K/L/N/O）
 
 **操作**:
 1. 每个 Component = 1 Step = 1 行（13 字段）
 2. Phase 写全称；Script Step 继承 v0.3；**Step = v0.3.1 activity 标题**（无则回退短标签）；Component = `CMP-XX · 简称`
 3. **Display Text** 严格按 E 列模版：`【】` 缺料 → `[待补]`（禁 NA）；`[]` → 可 NA；模版=`无` → `NA`
-4. **Display Image / Video Play 留空**（CD 后补）
+4. **Display Image / Video Play** 从 catalog N/O 带出：`NA` 或不需要；需要则 `前端字段+TBC`（CD 后补 objectKey）
 5. Kai Script 1（开场）+ Transition（收尾）；有互动（catalog K/L）才填 Script 2 / Feedback
    - **观/图/提示**（CMP-03/05/07/09）：Script2+Feedback 留空；Script1/Transition 从 Replay/Freeze/Visual/Kai 锚点提炼，禁止组件名入稿
    - **听音跟读 CMP-08**：从 `汉字 — 拼音 — gloss` 填 DT / Script1，不取 activity 标题

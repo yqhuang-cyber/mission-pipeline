@@ -67,9 +67,9 @@ export const NODE_SPECS: Record<NodeId, NodeSpec> = {
     artifact: 'v0.4 component content',
     goldPath: 'missions/mission_4/v0.4_component_content_p1.md',
     operations: [
-      '按 1 Component = 1 Step 填 13 字段（meta model v0.4.4）',
+      '按 1 Component = 1 Step 填 13 字段（meta model v0.4.5）',
       'Display Text 按 catalog E 列（【】待补 / [] NA）',
-      'Image/Video 留空给 CD',
+      'Image/Video 按 catalog N/O（NA 或 前端字段+TBC）',
       'Kai 开场/互动/反馈/收尾；按 K/L 判断互动',
       '按 phase 拆 4 文件',
     ],

@@ -7,6 +7,7 @@ import {
   type PhaseId,
 } from '../master/eligibility.js'
 import { validateN1, type ScriptStep } from '../validators/n1.js'
+import { hasFocusLemma } from './mcqFocus.js'
 
 export type NodeEngineResult = {
   content: string
@@ -55,19 +56,18 @@ function guessPhase(index: number, title: string): PhaseId {
   return 'P4'
 }
 
-/** Long-stem traditional MCQ → CMP-33; short meaning-inference → CMP-13 */
-function hasLongStemMcq(body: string): boolean {
+/**
+ * Traditional MCQ (CMP-33) vs focus-lemma MCQ (CMP-13).
+ * CMP-13 左侧有【焦点】放大框：只在正文要标出一个目标词/语素时建议 13。
+ * 「老师在问什么」这类直接理解题没有焦点词 → CMP-33。
+ */
+function prefersTraditionalMcq(body: string): boolean {
   if (!body) return false
   const hasChoices =
     /student choices/i.test(body) ||
     /(?:^|\n)\s*[ABC][\).:\s]\s*\S+/m.test(body)
   if (!hasChoices) return false
-  // Short meaning-inference prompts stay on CMP-13
-  if (/在问什么|在做什么|what (?:is|does).*(?:ask|mean)|meaning/i.test(body)) {
-    const kaiLead = body.split(/student choices/i)[0] || body
-    // If Kai setup before choices is long, still prefer legacy
-    if (kaiLead.replace(/\s+/g, ' ').trim().length < 120) return false
-  }
+  if (hasFocusLemma('', body)) return false
   return true
 }
 
@@ -80,7 +80,14 @@ function formatSuggested(phase: PhaseId, name: string, body = ''): string {
   if (/opening story/i.test(name)) {
     return 'CMP-03 (视频播放) + CMP-33 (选择题（传统版）, 长题干理解检测)'
   }
-  if (hasLongStemMcq(body) && PHASE_ALLOWED[phase].includes('CMP-33')) {
+  if (
+    /flag|国旗|\/ map/i.test(body) &&
+    /[\u4e00-\u9fff]人/.test(body) &&
+    PHASE_ALLOWED[phase].includes('CMP-10')
+  ) {
+    return 'CMP-10 (图文卡片)'
+  }
+  if (prefersTraditionalMcq(body) && PHASE_ALLOWED[phase].includes('CMP-33')) {
     const base = ids
       .filter((id) => id !== 'CMP-13' && id !== 'CMP-33')
       .slice(0, 1)
@@ -270,11 +277,15 @@ ${eligibilityBlock()}
 - P4 建议里通常应出现 CMP-21 或 CMP-26
 - 不要连续三个及以上“纯观看”组件（如连续 CMP-03/05/09）
 
-# 选择题选型（硬，按正文交互信号，不要只看 step 标题）
+# 选择题选型（硬，按正文交互信号，不要只看 step 标题 / 题干长短）
 - 正文出现 \`Student choices\` / \`A B C\` 等选项时，**必须**挂选择类 component，禁止只用 CMP-03/09 观看组件
-- **CMP-33**（选择题传统版 / single-choice-legacy）：**题干较长**的传统单选——Kai 先铺垫再提问、片后理解检测（如 Opening Story 后 "How many countries did you hear?"）
-- **CMP-13**（单项选择 / single-choice-simple）：**短题干含义推断**（左焦点词 + 右选项；如 "老师在问什么？"）
-- Opening Story（视频 + 片后长题干 MCQ）标准建议：\`CMP-03 + CMP-33\`，不要写成 CMP-03 + CMP-09
+- **CMP-33**（选择题传统版）：直接理解题，题干里**没有**要单独放大的知识点。例："What is the teacher trying to find out?" / "How many countries did you hear?"
+- **CMP-13**（单项选择）：左侧有【焦点】放大框。题干里有要标识的知识点（**新知或旧知**），选项对着该点的含义/功能。例：Highlight 人 / "What do you think 人 is doing here?" / "What do you think 朋友 means?" / Kai asks「你叫什么名字？」选 Name。单元意图写「发现规律」但活动已是单选，仍用 13，不要改成 CMP-11
+- **CMP-07**（句型学习）：锚点已有观察结果时用。左侧挂例句，右侧挂公式（如 Country + 人 / 中国 + 人 → 中国人）。不要用只有例句槽的 CMP-11
+- **CMP-11**（句型观察）：只有例句、先让学生自己发现，还没写出公式
+- **CMP-10**（图文卡片）：一张图表意、汉字标出一个知识点。例：Screen shows UK flag + 「英国人」。不要只用 CMP-09（全屏大图没有汉字槽）
+- **CMP-09**（全屏大图）：纯场景视觉，不承载要学的那个词
+- Opening Story（视频 + 片后理解检测）标准建议：\`CMP-03 + CMP-33\`，不要写成 CMP-03 + CMP-09
 
 # 示例（结构示意，内容请按真实 v0.1 生成）
 

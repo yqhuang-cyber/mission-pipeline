@@ -1,6 +1,6 @@
-# Mission Phase Step Meta Model v0.4.4
+# Mission Phase Step Meta Model v0.4.5
 
-> **版本**: v0.4.4  
+> **版本**: v0.4.5  
 > **文件**: `master/mission_phase_step_meta_model.md`  
 > **数据源**: `mission_spec_schema.csv` · `component_catalog.json` (v0729) · `phase_component_eligibility_v0.2.md` · **v0.3 stepped script**
 >
@@ -50,7 +50,7 @@ Mission
 | 所选 Component + content outline | Component、Step、Display Text、Kai*、KP… |
 | catalog E 模版 · F 示例 · J 目的 · K 互动 · L 用户输入 | 约束生成与「是否有互动」 |
 
-**Display Image / Video Play：流水线一律留空**，CD 后补。
+**Display Image / Video Play：按 catalog N/O 列填默认值。** 不需要图/视频写 `NA`；需要则写前端字段名 + `TBC`（如 `imageUrl+TBC`、`video.objectKey+TBC`）。CD 把 `TBC` 换成实际 objectKey。
 
 ---
 
@@ -63,8 +63,8 @@ Mission
 | 3 | Step | ✅ 生成 | 对齐 Component 的**短标签** |
 | 4 | Component | ✅ | `CMP-XX · 简称` |
 | 5 | Display Text | ✅ 生成 | 严循模版；从 outline 抽要素 |
-| 6 | Display Image | ⬜ 留空 | CD 后补 |
-| 7 | Video Play | ⬜ 留空 | CD 后补 |
+| 6 | Display Image | ✅ catalog 默认 | `NA` 或不需要时；需要则 `前端字段+TBC` |
+| 7 | Video Play | ✅ catalog 默认 | 同上 |
 | 8 | Kai Script 1 | ✅ 生成 | Step **开始**讲解，短 |
 | 9 | Kai Script 2 | 条件 | **互动前**触发语；无互动则空 |
 | 10 | Kai Feedback - Correct | 条件 | 互动正确反馈；无互动则空 |
@@ -146,7 +146,14 @@ Kai Script 1（开场讲解）
 
 ### 3.6–3.7 Display Image / Video Play
 
-流水线 **留空**；CD 后补 objectKey（不用完整 URL）。
+流水线按 **catalog N/O 列**填默认值：
+
+| 情况 | 填法 |
+|---|---|
+| 组件 UI **没有**内容图 / 内容视频槽（Kai 数字人侧栏不算） | `NA` |
+| 有槽、素材待补 | 前端字段名 + `TBC`，如 `imageUrl+TBC`、`video.objectKey+TBC`、`backgroundVideo.objectKey+TBC` |
+
+CD 将 `TBC` 换成 objectKey（不用完整 URL）。Kai 老师头像是产品壳，不写进这两列。
 
 ### 3.8 Kai Script 1（开场讲解）
 
@@ -253,8 +260,8 @@ Pattern: 你是哪国人？ / 我是XX人。
 | Step | Opening MCQ — countries heard |
 | Component | CMP-33 · 选择题（传统版） |
 | Display Text | （按该 CMP 模版；`【】` 槽已填实或 `[待补]`） |
-| Display Image | （空） |
-| Video Play | （空） |
+| Display Image | `NA` |
+| Video Play | `NA` |
 | Kai Script 1 | Welcome back, [User Name]. First, just watch. |
 | Kai Script 2 | How many countries did you hear? Tap one. |
 | Kai Feedback - Correct | Good — hold onto that. |
@@ -269,4 +276,4 @@ Pattern: 你是哪国人？ / 我是XX人。
 | 版本 | 日期 | 变更 |
 |---|---|---|
 | v0.4.3 | 2026-08-11 | 首版逐字段填法 |
-| v0.4.4 | 2026-08-11 | 优化：【】/[] 与待补；Kai 时间线与长度；互动判定挂钩 K/L；主键/复用；禁编造；去重精简 |
+| v0.4.5 | 2026-08-17 | Display Image / Video Play 改为 catalog N/O 默认值（NA 或 前端字段+TBC） |

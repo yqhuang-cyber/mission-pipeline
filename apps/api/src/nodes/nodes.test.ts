@@ -12,6 +12,7 @@ import {
   parseV03Tables,
   runN3,
   buildHeuristicRow,
+  sanitizeKaiSpeech,
   parseMissionKnowledge,
   parseV04BundleToEditRows,
   rebuildV04FromEditRows,
@@ -48,6 +49,83 @@ describe('N1 baseline-aligned format', () => {
     expect(out).toMatch(/建议 component/)
     const v = validateN1(out)
     expect(v.steps.length).toBeGreaterThan(0)
+  })
+
+  it('heuristic N1 suggests CMP-33 for direct MCQ and CMP-13 for focus-lemma MCQ', () => {
+    const direct = heuristicPhasedScript(
+      'Demo',
+      'Friends',
+      `**5\\. CONTEXT STORY**
+Audio: 你是哪国人？
+Kai: What is the teacher trying to find out?
+Student choices:
+A. Tom's name
+B. Where Tom is from
+C. If Tom is a teacher
+`,
+    )
+    expect(direct).toMatch(
+      /## script_step 5\.[\s\S]*?\*\*建议 component\*\*:.*CMP-33/,
+    )
+    expect(direct).not.toMatch(
+      /## script_step 5\.[\s\S]*?\*\*建议 component\*\*:.*CMP-13/,
+    )
+
+    const focus = heuristicPhasedScript(
+      'Demo',
+      'Friends',
+      `**11\\. DISCOVERY**
+Highlight: 朋友
+Kai: What do you think 朋友 means?
+Student choices:
+A. Teacher
+B. Friend
+C. Student
+`,
+    )
+    expect(focus).toMatch(
+      /## script_step 11\.[\s\S]*?\*\*建议 component\*\*:.*CMP-13/,
+    )
+    expect(focus).not.toMatch(
+      /## script_step 11\.[\s\S]*?\*\*建议 component\*\*:.*CMP-33/,
+    )
+
+    const listenGloss = heuristicPhasedScript(
+      'Demo',
+      'Friends',
+      `**5\\. CONNECT**
+Kai asks: 你是哪国人？
+Student choices:
+A. Name
+B. Country
+Student chooses: Country
+`,
+    )
+    expect(listenGloss).toMatch(
+      /## script_step 5\.[\s\S]*?\*\*建议 component\*\*:.*CMP-13/,
+    )
+    expect(listenGloss).not.toMatch(
+      /## script_step 5\.[\s\S]*?\*\*建议 component\*\*:.*CMP-33/,
+    )
+
+    const oldKp = heuristicPhasedScript(
+      'Demo',
+      'Friends',
+      `**6\\. CONNECT**
+You already know how to ask someone's name.
+Kai asks: 你叫什么名字？
+Student choices:
+A. Name
+B. Country
+Student chooses: Name
+`,
+    )
+    expect(oldKp).toMatch(
+      /## script_step 6\.[\s\S]*?\*\*建议 component\*\*:.*CMP-13/,
+    )
+    expect(oldKp).not.toMatch(
+      /## script_step 6\.[\s\S]*?\*\*建议 component\*\*:.*CMP-33/,
+    )
   })
 })
 
@@ -90,7 +168,8 @@ describe('N2/N3/N4 engines per pipeline_design nodes', () => {
     const rows = parseV04ToRows(n3.content)
     expect(rows.length).toBeGreaterThan(0)
     expect(rows[0]!.Component).toMatch(/CMP-/)
-    expect(rows[0]!['Display Image']).toBe('')
+    expect(rows[0]!['Display Image']).toMatch(/^(NA|.+\+TBC)$/)
+    expect(rows[0]!['Video Play']).toMatch(/^(NA|.+\+TBC)$/)
     expect(rows[0]!['Kai Script 1'].length).toBeGreaterThan(0)
 
     const csv = rowsToCsv(rows.slice(0, 2), false)
@@ -216,6 +295,47 @@ describe('N3 Kai speech + knowledge from v0.2', () => {
     expect(row.Step).toBe('听辨练习：问名字')
   })
 
+  it('sanitizeKaiSpeech strips em dashes for TTS', () => {
+    expect(sanitizeKaiSpeech('Your turn — try it.')).toBe('Your turn. try it.')
+    expect(sanitizeKaiSpeech('朋友 — péng you — friend.')).toBe(
+      '朋友. péng you. friend.',
+    )
+    expect(sanitizeKaiSpeech('Nice – you said it.')).not.toMatch(/[—–]/)
+  })
+
+  it('CMP-33 观后理解: Script1=atmosphere, Script2=tap prompt, Transition=closing', () => {
+    loadCatalogComponents()
+    const row = buildHeuristicRow({
+      phase: 'P1',
+      scriptStep: 2,
+      scriptName: 'OPENING STORY',
+      purpose: '整体输入、激活先验、引发好奇',
+      cmpId: 'CMP-33',
+      outline: `**Kai:**
+Hmm.
+Names. Countries. Friends.
+A lot is happening.
+How many countries did you hear
+Student choices:
+A 1 B 2 C 3
+Where is Tom come from?
+**Kai:**
+Keep the story in mind.
+We'll come back to it.`,
+      indexInStep: 2,
+      totalInStep: 2,
+      activityTitle: '观后理解检测',
+    })
+    expect(row['Kai Script 1']).toMatch(/Hmm/)
+    expect(row['Kai Script 1']).toMatch(/Names\. Countries\. Friends/)
+    expect(row['Kai Script 1']).toMatch(/A lot is happening/)
+    expect(row['Kai Script 1']).not.toMatch(/How many countries|A 1|Keep the story|come back/i)
+    expect(row['Kai Script 2']).toBe('How many did you catch? Tap one.')
+    expect(row['Kai Script 2']).not.toMatch(/A 1|Keep the story/i)
+    expect(row['Transition Script']).toMatch(/Keep the story|come back/i)
+    expect(row['Transition Script']).not.toMatch(/Hmm|How many did you catch/i)
+  })
+
   it('N3 discovery 11–13 styles: CMP-03/09 watch, CMP-08/07/35/15 fill', () => {
     loadCatalogComponents()
 
@@ -230,7 +350,8 @@ describe('N3 Kai speech + knowledge from v0.2', () => {
       totalInStep: 5,
       activityTitle: '情境回放：她是我的朋友',
     })
-    expect(replay['Kai Script 1']).toMatch(/Listen again.*她是我的朋友/)
+    expect(replay['Kai Script 1']).toMatch(/Listen again.*Tom says.*她是我的朋友/)
+    expect(replay['Kai Script 1']).not.toMatch(/[—–]/)
     expect(replay['Kai Script 2']).toBe('')
     expect(replay['Transition Script']).toMatch(/Freeze/)
 
@@ -261,7 +382,8 @@ describe('N3 Kai speech + knowledge from v0.2', () => {
       totalInStep: 5,
     })
     expect(listen.DisplayText).toMatch(/【汉字】\s*朋友/)
-    expect(listen['Kai Script 1']).toMatch(/朋友 — péng you — friend/)
+    expect(listen['Kai Script 1']).toMatch(/朋友\. péng you\. friend/)
+    expect(listen['Kai Script 1']).not.toMatch(/[—–]/)
     expect(listen['Kai Script 2']).toMatch(/Listen and repeat: 朋友/)
     expect(listen['Kai Feedback Script - Correct']).toBe('Good.')
 

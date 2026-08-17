@@ -12,6 +12,8 @@ type CatalogCmp = {
   userInput: string
   designRule: string
   keyFields: string
+  displayImage?: string
+  videoPlay?: string
   phases: string[]
   previewImages: string[]
 }
@@ -177,6 +179,10 @@ function pick(id: string) {
               <dd>{{ selected.designRule || '—' }}</dd>
               <dt>v0.3 关键字段</dt>
               <dd class="mono">{{ selected.keyFields }}</dd>
+              <dt>Display Image</dt>
+              <dd class="mono">{{ selected.displayImage || 'NA' }}</dd>
+              <dt>Video Play</dt>
+              <dd class="mono">{{ selected.videoPlay || 'NA' }}</dd>
             </dl>
           </div>
         </div>

@@ -115,6 +115,6 @@ CD 以教学动作理解活动，不要求原文分区互斥。
 | 教学动作 | 边界 | 标题 | 选型 |
 |---|---|---|---|
 | 引导发现 + 检查 | notice / taps / Highlight / Choices | 发现构词规律 | CMP-11 / CMP-13 |
-| 显式规律呈现 | `Screen:` … `+ 人 →` 或 `Kai: Country + 人` | 句型规律识别 | CMP-11 / CMP-07 |
+| 显式规律呈现 | `Screen:` … `+ 人 →` 或 `Kai: Country + 人` | 句型规律识别 | CMP-07（左例句右公式）；CMP-11 无公式槽 |
 
 实现：`splitDiscoverFromPatternFormula`（注意 `**Screen:**` 尾部 `*` 不能破坏换行匹配）。

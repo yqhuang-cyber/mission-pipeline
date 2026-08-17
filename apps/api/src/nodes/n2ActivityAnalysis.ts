@@ -10,6 +10,9 @@ import { parsePhasedScript } from '../validators/n1.js'
 import type { NodeEngineResult } from './n1.js'
 import { outlineFromBody } from './n2.js'
 import type { MappedStep } from '../validators/n2.js'
+import { hasFocusLemma } from './mcqFocus.js'
+
+export { hasFocusLemma } from './mcqFocus.js'
 
 export type ActivityCandidate = {
   id: string
@@ -55,16 +58,54 @@ type RawChunk = { title: string; text: string }
  */
 type ActivityNeed =
   | 'contrast_sentences'
-  | 'meaning_choice'
+  | 'meaning_choice_direct'
+  | 'meaning_choice_focus'
   | 'listen_choose'
   | 'watch'
   | 'listen_repeat'
   | 'pattern_discover'
+  | 'pattern_formula'
+  | 'lemma_visual'
   | 'assemble'
   | 'dialogue'
   | 'prompted_say'
   | 'mission'
   | 'generic'
+
+/** 锚点里已经写出观察结果：Country + 人 / 中国 + 人 → 中国人 */
+function hasStatedPattern(text: string): boolean {
+  const t = text.replace(/\s+/g, ' ')
+  if (/Country\s*\+\s*人/i.test(t)) return true
+  if (/[\u4e00-\u9fff]+\s*\+\s*[\u4e00-\u9fff]+\s*→/.test(t)) return true
+  if (/[\u4e00-\u9fff]+\s*→\s*[\u4e00-\u9fff]+的/.test(t) && !/→\s*\?/.test(t)) {
+    return true
+  }
+  return false
+}
+
+/** Story 进场 + Friend 1/2/3 同任务多轮 = 一套角色扮演，不是句型对比或看开场故事 */
+function isRolePlaySet(text: string): boolean {
+  const t = text.replace(/\*\*/g, '')
+  if (/opening\s+story|context\s+story|Opening story plays/i.test(t)) {
+    return false
+  }
+  const rounds = (t.match(/Friend\s+\d+\s*\(/gi) || []).length
+  if (rounds >= 2) return true
+  if (
+    /Friend\s+\d+\s*\((?:Full|Reduced|Minimal)\s+Support\)/i.test(t) &&
+    /On Screen|Student decides|take the lead/i.test(t)
+  ) {
+    return true
+  }
+  if (
+    /^\s*Story\b/im.test(t) &&
+    /Friend\s+\d+/i.test(t) &&
+    /Student\b/i.test(t)
+  ) {
+    return true
+  }
+  return false
+}
 
 function detectActivityNeed(
   title: string,
@@ -73,31 +114,64 @@ function detectActivityNeed(
 ): ActivityNeed {
   // Trust pedagogical titles after naming (strongest signal)
   if (/对比已学|对比两句|并排观察/i.test(title)) return 'contrast_sentences'
-  if (/听辨练习/i.test(title)) return 'listen_choose'
-  if (/听后含义推断|含义推断|观后理解|探索「|发现「的」/i.test(title)) {
-    return 'meaning_choice'
+  if (/听辨练习/i.test(title)) {
+    return hasFocusLemma(title, text)
+      ? 'meaning_choice_focus'
+      : 'listen_choose'
+  }
+  if (/听后含义推断|含义推断|观后理解/i.test(title)) {
+    return hasFocusLemma(title, text)
+      ? 'meaning_choice_focus'
+      : 'meaning_choice_direct'
+  }
+  // 单元意图可以是「发现规律」，但本活动若已是「标出语素 + 单选」，按选择题走
+  if (
+    /Choices:|Student\s+chooses|选项/i.test(text) &&
+    hasFocusLemma(title, text)
+  ) {
+    return 'meaning_choice_focus'
+  }
+  if (/探索「|发现「的」/i.test(title) && /Choices:|Student\s+chooses|选项/i.test(text)) {
+    return 'meaning_choice_focus'
   }
   if (/情境回放|观看开场|例证输入/i.test(title)) return 'watch'
-  if (/聚焦知识点/i.test(title)) return 'pattern_discover'
+  if (/看图/i.test(title)) return 'watch'
+  if (/聚焦知识点/i.test(title)) return 'lemma_visual'
   if (/听音跟读/i.test(title)) return 'listen_repeat'
-  if (/发现构词|句型观察/i.test(title)) return 'pattern_discover'
+  if (/句型规律识别|句型呈现|呈现构词|总结构词/i.test(title)) return 'pattern_formula'
+  if (/发现构词|句型观察/i.test(title)) {
+    return hasStatedPattern(text) ? 'pattern_formula' : 'pattern_discover'
+  }
   if (/构建「|词块造句/i.test(title)) return 'assemble'
   if (/指人说/i.test(title)) return 'prompted_say'
-  if (/对话练习|迁移：|角色扮演/i.test(title)) return 'dialogue'
+  if (/对话练习|角色扮演/i.test(title)) return 'dialogue'
+  if (/综合练习/i.test(title) && isRolePlaySet(text)) return 'dialogue'
+  if (/迁移：/i.test(title)) return 'dialogue'
+  if (isRolePlaySet(text)) return 'dialogue'
   if (/发布 Mission|Mission/i.test(title)) return 'mission'
 
   const hay = `${title}\n${text}\n${purpose}`
   if (/Two questions|区分.*问句/i.test(hay)) {
-    if (!/Listen and choose|Kai asks:[\s\S]*Student chooses/i.test(text)) {
+    if (
+      !/Listen and choose|Kai asks:[\s\S]*Student chooses/i.test(text) &&
+      !isRolePlaySet(text)
+    ) {
       return 'contrast_sentences'
     }
   }
   if (
     /你叫什么名字[\s\S]*你是哪国人|你是哪国人[\s\S]*你叫什么名字/i.test(text) &&
-    !/Student chooses|Choices:|Listen and choose/i.test(text)
+    !/Student chooses|Choices:|Listen and choose/i.test(text) &&
+    !isRolePlaySet(text)
   ) {
     return 'contrast_sentences'
   }
+  if (/Choices:|Student\s+chooses|单项选择/i.test(hay)) {
+    return hasFocusLemma(title, text)
+      ? 'meaning_choice_focus'
+      : 'meaning_choice_direct'
+  }
+  if (hasStatedPattern(text)) return 'pattern_formula'
   return 'generic'
 }
 
@@ -173,23 +247,141 @@ function fitComponentToNeed(
     return null
   }
 
-  if (need === 'listen_choose' || need === 'meaning_choice') {
+  if (need === 'listen_choose') {
+    // 听辨：听完直接选题，通常没有要放大的焦点词
+    if (c.id === 'CMP-33') {
+      return {
+        score: 18,
+        rationale: `适合：听辨后直接选题，CMP-33 题干+选项即可，无需【焦点】放大框`,
+      }
+    }
+    if (c.id === 'CMP-13') {
+      return {
+        score: 7,
+        rationale: `次选：CMP-13 左侧会放大焦点词，本题没有要标识的知识点`,
+      }
+    }
     if (isChoiceUi) {
       return {
-        score: 14,
-        rationale: `适合：模版含选项/答案，匹配听辨或含义推断`,
+        score: 9,
+        rationale: `适合：模版含选项/答案，可做听辨选择`,
+      }
+    }
+    return null
+  }
+
+  if (need === 'meaning_choice_direct') {
+    // 直接理解题（老师在问什么 / 听到几个国家）— 不要 CMP-13 焦点框
+    if (c.id === 'CMP-33') {
+      return {
+        score: 20,
+        rationale: `适合：直接理解题，题干没有要放大的知识点；CMP-33 只有题目+选项`,
+      }
+    }
+    if (c.id === 'CMP-13') {
+      return {
+        score: 5,
+        rationale: `不太适合：CMP-13 左侧有【焦点】放大框，本题是整句理解而非猜某个词`,
+      }
+    }
+    if (isChoiceUi) {
+      return {
+        score: 8,
+        rationale: `可用：能选题，但传统选择题（CMP-33）更贴切`,
+      }
+    }
+    return null
+  }
+
+  if (need === 'meaning_choice_focus') {
+    if (c.id === 'CMP-13') {
+      return {
+        score: 20,
+        rationale: `适合：听辨在识别目标问句/词的功能，CMP-13【焦点】可标出该知识点`,
+      }
+    }
+    if (c.id === 'CMP-33') {
+      return {
+        score: 8,
+        rationale: `可用：能做选择，但无焦点槽，弱化目标词`,
+      }
+    }
+    if (isChoiceUi) {
+      return {
+        score: 10,
+        rationale: `适合：模版含选项/答案，匹配含义判断`,
+      }
+    }
+    return null
+  }
+
+  if (need === 'lemma_visual') {
+    // 一张图把一个知识点说清楚（国旗/地图 + 「英国人」）→ 图文卡，不是纯大图、也不是句型规律
+    if (c.id === 'CMP-10' || (/【汉字】/.test(tpl) && /图文/.test(c.nameZh))) {
+      return {
+        score: 22,
+        rationale: `适合：用图表意、用【汉字】【拼音】标出该知识点；CMP-10 图文卡正是这一下`,
+      }
+    }
+    if (c.id === 'CMP-29') {
+      return {
+        score: 8,
+        rationale: `可用：能讲这个词，但词汇卡偏释义/部首，弱化「图→义」`,
+      }
+    }
+    if (c.id === 'CMP-09') {
+      return {
+        score: 5,
+        rationale: `不太适合：全屏大图没有汉字槽，图能到、知识点标不出来`,
+      }
+    }
+    if (exampleSlots >= 2 || hasLeftRight) {
+      return {
+        score: 3,
+        rationale: `不太适合：本活动只标一个知识点配图，不是多句对照发现规律`,
       }
     }
     return null
   }
 
   if (need === 'pattern_discover') {
-    if (exampleSlots >= 2 || hasLeftRight || /发现结构|规律/.test(purpose)) {
+    // 只有例句、先让学生自己看：CMP-11；右侧公式会提前灌输
+    if (c.id === 'CMP-11' || (exampleSlots >= 2 && !hasLeftRight)) {
       return {
-        score: 12,
-        rationale: `适合：利于多例对照发现规律（${clip(purpose || c.nameZh, 28)}）`,
+        score: 20,
+        rationale: `适合：多句对照让学生自己发现，CMP-11 只有【例句】槽、不提前给公式`,
       }
     }
+    if (c.id === 'CMP-07' || hasLeftRight) {
+      return {
+        score: 8,
+        rationale: `次选：能挂例句，但右侧公式会把规律说破，偏早`,
+      }
+    }
+    if (/发现结构|规律/.test(purpose)) {
+      return {
+        score: 6,
+        rationale: `部分适合：catalog 目的含观察/规律`,
+      }
+    }
+    return null
+  }
+
+  if (need === 'pattern_formula') {
+    // 已经有观察结果（Country + 人）：左侧例句 + 右侧公式 → CMP-07
+    if (c.id === 'CMP-07' || hasLeftRight) {
+      return {
+        score: 22,
+        rationale: `适合：锚点已有句型结果；CMP-07 左侧挂例句、右侧挂公式（如 Country + 人）`,
+      }
+    }
+    if (c.id === 'CMP-11' || exampleSlots >= 2) {
+      return {
+        score: 7,
+        rationale: `不太适合：CMP-11 只有例句槽，没有右侧公式位，观察结果挂不上去`,
+      }
+    }
+    return null
   }
 
   if (need === 'prompted_say') {
@@ -219,6 +411,39 @@ function fitComponentToNeed(
     }
   }
 
+  if (need === 'dialogue') {
+    if (c.id === 'CMP-15' || /角色扮演/.test(c.nameZh)) {
+      return {
+        score: 22,
+        rationale: `适合：同一交际任务多轮对话（Story 只是进场，Friend 1/2/3 是支架递减），CMP-15 角色扮演`,
+      }
+    }
+    if (c.id === 'CMP-19') {
+      return {
+        score: 8,
+        rationale: `次选：开放任务偏真实表现段；这里是带支架的综合练习`,
+      }
+    }
+    if (c.id === 'CMP-24') {
+      return {
+        score: 6,
+        rationale: `不太适合：单轮作答扛不住多轮欢迎对话`,
+      }
+    }
+    if (c.id === 'CMP-11' || exampleSlots >= 2) {
+      return {
+        score: -10,
+        rationale: `不适合：两句是对话里先后要说的话，不是并排观察句型`,
+      }
+    }
+    if (c.id === 'CMP-03' || c.id === 'CMP-05' || c.id === 'CMP-01') {
+      return {
+        score: -8,
+        rationale: `不适合：Story / welcome 是扮演进场，不是开场寒暄或看故事`,
+      }
+    }
+  }
+
   return null
 }
 
@@ -232,6 +457,51 @@ function buildSelectionThinking(
     return [
       `选型思考：本活动要展示并对比${pair}，让学生观察差异，不是先做选择题。`,
       `因此优先模版能挂多句的组件（句型观察/句型学习/图文卡），下调单项选择。`,
+      topIds.length ? `推荐顺序：${topIds.join(' → ')}` : '',
+    ]
+      .filter(Boolean)
+      .join(' ')
+  }
+  if (need === 'meaning_choice_direct') {
+    return [
+      `选型思考：这是直接理解题（问情境/意图），题干里没有要单独标识的知识点。`,
+      `CMP-13 左侧有焦点放大框，会空着或硬塞词；因此优先 CMP-33 传统选择题。`,
+      topIds.length ? `推荐顺序：${topIds.join(' → ')}` : '',
+    ]
+      .filter(Boolean)
+      .join(' ')
+  }
+  if (need === 'meaning_choice_focus') {
+    return [
+      `选型思考：题目是在识别某个知识点（新知或旧知），选项对着该点的含义/功能作答，需要把它标出来。`,
+      `因此优先 CMP-13（【焦点】放大框），CMP-33 作无焦点备选。`,
+      topIds.length ? `推荐顺序：${topIds.join(' → ')}` : '',
+    ]
+      .filter(Boolean)
+      .join(' ')
+  }
+  if (need === 'lemma_visual') {
+    return [
+      `选型思考：本活动用一张图表意、同时标出一个知识点（如「英国人」），是图文说明而不是纯看图或发现构词规律。`,
+      `因此优先 CMP-10 图文卡片；全屏大图（CMP-09）没有汉字槽。`,
+      topIds.length ? `推荐顺序：${topIds.join(' → ')}` : '',
+    ]
+      .filter(Boolean)
+      .join(' ')
+  }
+  if (need === 'pattern_formula') {
+    return [
+      `选型思考：锚点里已经写出观察结果（如 Country + 人 / 我 → 我的）。`,
+      `CMP-07 左侧挂供观察的句子，右侧挂句型公式；CMP-11 只有例句、没有公式槽。因此优先 CMP-07。`,
+      topIds.length ? `推荐顺序：${topIds.join(' → ')}` : '',
+    ]
+      .filter(Boolean)
+      .join(' ')
+  }
+  if (need === 'dialogue') {
+    return [
+      `选型思考：这是一套角色扮演综合练习（Story 进场 + 同一任务多轮，支架递减）。`,
+      `对话里先后说出目标句，不是并排对比句型；因此优先 CMP-15，不用 CMP-11。`,
       topIds.length ? `推荐顺序：${topIds.join(' → ')}` : '',
     ]
       .filter(Boolean)
@@ -271,21 +541,26 @@ const MICRO_HEAD_RE =
   /^(?:\*\*)?(?:Choices|Student\s*choices?|Student\s*chooses|Student\s*selects|Exactly\.?|Perfect\.?|Good\.?|AI pronunciation)/i
 
 const KEYWORD_HINTS: Array<{ re: RegExp; cmps: string[]; label: string }> = [
-  { re: /welcome|warm\s*up|课前|寒暄/i, cmps: ['CMP-01'], label: '开场寒暄' },
+  { re: /Welcome back|warm\s*up|课前寒暄|课前欢迎/i, cmps: ['CMP-01'], label: '开场寒暄' },
   {
     re: /your\s*mission|mission\s*goals?|start\s*mission|任务发布|学习目标/i,
     cmps: ['CMP-04', 'CMP-32'],
     label: 'Mission / Goals',
   },
   {
-    re: /video|视频|故事|opening\s*story|context\s*story|watch/i,
+    re: /video|视频|opening\s*story|context\s*story|Opening story plays|观看开场/i,
     cmps: ['CMP-03', 'CMP-05', 'CMP-23'],
     label: '观看 / 故事',
   },
   {
     re: /(?:Student\s*choices?|Choices:|单项选择|single[- ]?choice|How many countries|What is the teacher)/i,
-    cmps: ['CMP-13', 'CMP-33', 'CMP-02'],
+    cmps: ['CMP-33', 'CMP-13', 'CMP-02'],
     label: '选择题',
+  },
+  {
+    re: /【焦点】|What do you think\s+[\u4e00-\u9fff]|你觉得.{0,6}[「"“][\u4e00-\u9fff]/i,
+    cmps: ['CMP-13', 'CMP-33', 'CMP-02'],
+    label: '焦点含义选择',
   },
   {
     re: /listen|跟读|repeat|nǐ|pinyin/i,
@@ -293,12 +568,17 @@ const KEYWORD_HINTS: Array<{ re: RegExp; cmps: string[]; label: string }> = [
     label: '听音跟读',
   },
   {
-    re: /flag|国旗|fullscreen|全屏|image\s*card|图文/i,
-    cmps: ['CMP-09', 'CMP-10'],
-    label: '图片 / 图文',
+    re: /Visual:/i,
+    cmps: ['CMP-09'],
+    label: '看图',
   },
   {
-    re: /pattern|句型观察|noticing|公式|对比|两句|Two questions|distinguish|区分/i,
+    re: /Country\s*\+\s*人|[\u4e00-\u9fff]+\s*\+\s*[\u4e00-\u9fff]+\s*→|[\u4e00-\u9fff]+\s*→\s*[\u4e00-\u9fff]+的/i,
+    cmps: ['CMP-07', 'CMP-11'],
+    label: '句型公式',
+  },
+  {
+    re: /句型观察|noticing|对比|两句|Two questions|distinguish|区分/i,
     cmps: ['CMP-11', 'CMP-07', 'CMP-10'],
     label: '句型观察/对比',
   },
@@ -308,7 +588,7 @@ const KEYWORD_HINTS: Array<{ re: RegExp; cmps: string[]; label: string }> = [
     label: '词块造句',
   },
   {
-    re: /dialogue|对话|role\s*play|use\s+before/i,
+    re: /dialogue|对话|role\s*play|Friend\s+\d+\s*\(|use\s+before/i,
     cmps: ['CMP-15', 'CMP-19'],
     label: '对话 / 表演',
   },
@@ -416,6 +696,12 @@ export function nameActivity(
   ) {
     return '情境回放聚焦目标知识点'
   }
+  if (
+    /Visual:/i.test(t) &&
+    !/Highlight:|Choices:|Student chooses|Replay[.:]/i.test(t)
+  ) {
+    return /同学/.test(t) ? '看图：对照「同学」' : '看图'
+  }
   // Pattern noticing (guided discover) — not the later formula Screen
   if (
     /What do you notice|Student taps/i.test(t) &&
@@ -428,9 +714,16 @@ export function nameActivity(
     /(?:[\u4e00-\u9fff]+\s*\+\s*人\s*→|Country\s*\+\s*人|国家\s*\+\s*人)/i.test(
       t,
     ) &&
-    !/What do you notice|Student chooses|Choices:/i.test(t)
+    !/What do you notice|Student chooses|Choices:|Student builds:/i.test(t)
   ) {
     return '句型规律识别'
+  }
+  // Complete paradigm screen (我 → 我的) — not the predict/build trial
+  if (
+    /[\u4e00-\u9fff]+\s*→\s*[\u4e00-\u9fff]+的/.test(t) &&
+    !/Student builds:|Choices:|Student chooses|Can you predict|→\s*\?/i.test(t)
+  ) {
+    return '句型呈现'
   }
   if (/Country\s*\+\s*人|国家\s*\+\s*人/i.test(t) && /Student taps/i.test(t)) {
     return '发现构词规律'
@@ -494,7 +787,7 @@ export function nameActivity(
     return '词块造句练习'
   }
   if (/Student builds|chunks?|造句|Build the/i.test(t)) {
-    return '词块造句 / 句型建构'
+    return '词块造句'
   }
   // Prompted say-it after showing a person (meaning → Chinese form)
   if (
@@ -519,6 +812,11 @@ export function nameActivity(
     !/Kai shows/i.test(t)
   ) {
     return '对话练习：说出自己的国籍'
+  }
+  if (isRolePlaySet(t)) {
+    return /meet your new friends|welcome them|Friend\s+\d+/i.test(t)
+      ? '角色扮演：欢迎新同学'
+      : '角色扮演综合练习'
   }
   if (
     /Screen:/i.test(t) &&
@@ -589,7 +887,34 @@ function refineComprehensionBoundaries(parts: string[]): string[] {
   return out
 }
 
-/** Split Replay+Listen-again from following Audio+Choices+feedback */
+/** Replay / Visual / Highlight start new activities; don't split notice+Highlight. */
+function splitSceneKeywords(text: string): string[] {
+  if ((text.match(/Screen shows/gi) || []).length >= 2) return [text]
+  const bits = text
+    .split(
+      /(?=(?:\*\*)?(?:Replay[.:]|Then\s+replay\b|Visual:|Highlight:))/i,
+    )
+    .map((s) => s.trim())
+    .filter((s) => s.length > 8)
+  if (bits.length < 2) return [text]
+
+  const out: string[] = []
+  for (const bit of bits) {
+    const head = bit.replace(/\*\*/g, '').trim()
+    if (/^Highlight:/i.test(head) && out.length) {
+      const prev = out[out.length - 1]!
+      if (
+        /What do you notice|Student taps/i.test(prev) &&
+        !/Replay[.:]\s*$/i.test(prev.replace(/\*\*/g, '').trim())
+      ) {
+        out[out.length - 1] = `${prev}\n\n${bit}`
+        continue
+      }
+    }
+    out.push(bit)
+  }
+  return out.length >= 2 ? out : [text]
+}
 function splitReplayFromComprehension(text: string): string[] {
   const normalized = text.replace(/\*\*/g, '').trim()
   const m =
@@ -651,6 +976,33 @@ function mergeWatchPreamble(parts: string[]): string[] {
       continue
     }
     out.push(cur)
+  }
+  return out
+}
+
+/**
+ * After Video ends, Kai atmosphere (Hmm / Names. Countries / A lot is happening)
+ * belongs with the quiz activity — not the watch activity.
+ */
+function attachPostWatchAtmosphereToQuiz(parts: string[]): string[] {
+  if (parts.length < 2) return parts
+  const out = [...parts]
+  for (let i = 0; i < out.length - 1; i++) {
+    const watch = out[i]!
+    const quiz = out[i + 1]!
+    if (!/How many countries did you hear/i.test(quiz)) continue
+    if (!/Video\s+ends/i.test(watch)) continue
+    if (!/Hmm|Names\.|A lot is happening/i.test(watch)) continue
+
+    const veMatch = /Video\s+ends\.?/i.exec(watch)
+    if (!veMatch || veMatch.index == null) continue
+    const cut = veMatch.index + veMatch[0].length
+    const after = watch.slice(cut).trim()
+    if (!after || !/(?:\*\*)?Kai:/i.test(after)) continue
+    if (!/Hmm|Names\.|A lot is happening/i.test(after)) continue
+
+    out[i] = watch.slice(0, cut).trim()
+    out[i + 1] = `${after}\n\n${quiz}`.trim()
   }
   return out
 }
@@ -965,16 +1317,53 @@ function enrichImpliedListenChooseOptions(text: string): string {
   )
 }
 
-/** After a completed choice, Student builds starts a new practice activity */
+/** After a completed choice, Student builds starts a new practice activity.
+ * If a given-example Screen (我 → 我的) / predict prompt precedes the build,
+ * keep that stem with the assemble activity — not the meaning-check. */
 function splitPostChoiceBuild(text: string): string[] {
   if (!/Student builds:/i.test(text)) return [text]
   if (!/Student chooses|Student selects/i.test(text)) {
-    // pure parallel builds handled elsewhere
     return [text]
   }
-  const soft = text.split(/(?=Student builds:)/i)
-  if (soft.length >= 2) {
-    return soft.map((p) => p.trim()).filter((p) => p.length > 20)
+  const buildAt = text.search(/Student builds:/i)
+  if (buildAt < 0) return [text]
+  const beforeBuild = text.slice(0, buildAt)
+  const givenAt = beforeBuild.search(
+    /(?:\*\*)?Screen:\*{0,2}\s*(?:\n\s*)?[\u4e00-\u9fff]+\s*→\s*[\u4e00-\u9fff]+的/i,
+  )
+  const predictAt = beforeBuild.search(/Can you predict/i)
+  let cut = buildAt
+  if (givenAt >= 0) cut = givenAt
+  else if (predictAt >= 0) cut = predictAt
+  const before = text.slice(0, cut).trim()
+  const after = text.slice(cut).trim()
+  if (before.length < 40 || after.length < 15) return [text]
+  return [before, after]
+}
+
+/**
+ * After Student builds + feedback, a complete paradigm Screen
+ * (我 → 我的 / 你 → 你的 / …) is a separate 「句型呈现」 — not more of the assemble.
+ */
+function splitBuildFromPatternPresent(text: string): string[] {
+  if (!/Student builds:/i.test(text)) return [text]
+  const buildAt = text.search(/Student builds:/i)
+  if (buildAt < 0) return [text]
+  const rest = text.slice(buildAt)
+  const screenRe = /(?:\*\*)?Screen:\*{0,2}\s*(?:\n\s*)?(?=[\u4e00-\u9fff]+\s*→)/gi
+  let match: RegExpExecArray | null
+  while ((match = screenRe.exec(rest))) {
+    if (match.index < 12) continue
+    const window = rest.slice(match.index, match.index + 220)
+    const complete = (
+      window.match(/[\u4e00-\u9fff]+\s*→\s*[\u4e00-\u9fff]+的/g) || []
+    ).length
+    if (complete >= 2 && !/→\s*\?/.test(window)) {
+      const abs = buildAt + match.index
+      const before = text.slice(0, abs).trim()
+      const after = text.slice(abs).trim()
+      if (before.length >= 20 && after.length >= 12) return [before, after]
+    }
   }
   return [text]
 }
@@ -1069,13 +1458,16 @@ function splitBodyIntoChunks(body: string, purpose: string): RawChunk[] {
   }
 
   parts = mergeWatchPreamble(parts)
+  parts = attachPostWatchAtmosphereToQuiz(parts)
   parts = parts.flatMap(splitReplayFromComprehension)
+  parts = parts.flatMap(splitSceneKeywords)
   parts = parts.flatMap(splitConnectPractice)
   parts = parts.flatMap(splitParallelListenChoose)
   parts = parts.flatMap(splitPostChoiceBuild)
   parts = parts.flatMap(splitParallelBuilds)
   parts = parts.flatMap(splitParallelShowSayIt)
   parts = parts.flatMap(splitDiscoverFromPatternFormula)
+  parts = parts.flatMap(splitBuildFromPatternPresent)
   parts = mergeMicroChunks(parts)
   parts = refineComprehensionBoundaries(parts)
   parts = attachPreDrillScreen(parts)
@@ -1365,7 +1757,11 @@ function scoreCandidates(
   const hay = `${purpose}\n${chunk.title}\n${chunk.text}`
   for (const hint of KEYWORD_HINTS) {
     if (hint.re.test(hay)) {
-      hint.cmps.forEach((id, i) => bump(id, 8 - i, `匹配「${hint.label}」`))
+      // 「选择题」只表示这是 MCQ，不在 13/33 之间分胜负（由 pedagogical fit 决定）
+      const even = hint.label === '选择题'
+      hint.cmps.forEach((id, i) =>
+        bump(id, even ? 5 : 8 - i, `匹配「${hint.label}」`),
+      )
     }
   }
 
@@ -1377,20 +1773,36 @@ function scoreCandidates(
     )
   }
   if (/听后含义推断|含义推断|观后理解/i.test(chunk.title)) {
-    ;['CMP-33', 'CMP-13', 'CMP-02'].forEach((id, i) =>
-      bump(id, 10 - i, '活动类型：含义推断'),
-    )
+    if (hasFocusLemma(chunk.title, chunk.text)) {
+      ;['CMP-13', 'CMP-33', 'CMP-02'].forEach((id, i) =>
+        bump(id, 16 - i * 4, '活动类型：焦点含义推断'),
+      )
+    } else {
+      ;['CMP-33', 'CMP-13', 'CMP-02'].forEach((id, i) =>
+        bump(id, 16 - i * 4, '活动类型：直接理解选择题'),
+      )
+    }
   }
   // Listen-and-choose practice (separate from contrast display)
   if (/听辨练习/i.test(chunk.title)) {
-    ;['CMP-13', 'CMP-33', 'CMP-02'].forEach((id, i) =>
-      bump(id, 12 - i, '活动类型：听辨选择'),
-    )
+    if (hasFocusLemma(chunk.title, chunk.text)) {
+      ;['CMP-13', 'CMP-33', 'CMP-02'].forEach((id, i) =>
+        bump(id, 12 - i, '活动类型：听辨（有焦点词）'),
+      )
+    } else {
+      ;['CMP-33', 'CMP-13', 'CMP-02'].forEach((id, i) =>
+        bump(id, 12 - i, '活动类型：听辨选择'),
+      )
+    }
   }
   if (/听音跟读/i.test(chunk.title)) {
     bump('CMP-08', 12, '活动类型：听音跟读')
   }
-  if (/情境回放/i.test(chunk.title)) {
+  if (/看图/i.test(chunk.title)) {
+    ;['CMP-09', 'CMP-03'].forEach((id, i) =>
+      bump(id, 18 - i * 8, '活动类型：看图'),
+    )
+  } else if (/情境回放/i.test(chunk.title)) {
     ;['CMP-05', 'CMP-03'].forEach((id, i) =>
       bump(id, 14 - i, '活动类型：情境回放'),
     )
@@ -1401,7 +1813,7 @@ function scoreCandidates(
   }
   if (/聚焦知识点/i.test(chunk.title)) {
     ;['CMP-10', 'CMP-29', 'CMP-09'].forEach((id, i) =>
-      bump(id, 14 - i, '活动类型：聚焦目标词'),
+      bump(id, 18 - i * 6, '活动类型：图文聚焦知识点'),
     )
   }
   if (/例证输入/i.test(chunk.title)) {
@@ -1410,13 +1822,22 @@ function scoreCandidates(
     )
   }
   if (/发现「的」|探索「朋友」|发现构词/i.test(chunk.title)) {
-    ;['CMP-11', 'CMP-29', 'CMP-13'].forEach((id, i) =>
-      bump(id, 12 - i, '活动类型：语素/规律发现'),
-    )
+    if (
+      hasFocusLemma(chunk.title, chunk.text) &&
+      /Choices:|Student\s+chooses|选项/i.test(chunk.text)
+    ) {
+      ;['CMP-13', 'CMP-33', 'CMP-02'].forEach((id, i) =>
+        bump(id, 16 - i * 4, '活动类型：语素含义选择（有焦点）'),
+      )
+    } else {
+      ;['CMP-11', 'CMP-29', 'CMP-13'].forEach((id, i) =>
+        bump(id, 12 - i, '活动类型：语素/规律发现'),
+      )
+    }
   }
-  if (/句型规律识别|呈现构词|总结构词/i.test(chunk.title)) {
-    ;['CMP-11', 'CMP-07', 'CMP-10'].forEach((id, i) =>
-      bump(id, 14 - i, '活动类型：句型规律呈现'),
+  if (/句型规律识别|句型呈现|呈现构词|总结构词/i.test(chunk.title)) {
+    ;['CMP-07', 'CMP-11', 'CMP-10'].forEach((id, i) =>
+      bump(id, 18 - i * 6, '活动类型：呈现句型公式'),
     )
   }
   if (/构建「|词块造句/i.test(chunk.title)) {
@@ -1438,7 +1859,11 @@ function scoreCandidates(
       bump(id, 10 - i, '活动类型：Mission 发布'),
     )
   }
-  if (/对话练习|迁移：|角色扮演/i.test(chunk.title)) {
+  if (/角色扮演|综合练习/i.test(chunk.title)) {
+    ;['CMP-15', 'CMP-19'].forEach((id, i) =>
+      bump(id, 18 - i * 8, '活动类型：角色扮演综合练习'),
+    )
+  } else if (/对话练习|迁移：/i.test(chunk.title)) {
     ;['CMP-15', 'CMP-19'].forEach((id, i) =>
       bump(id, 10 - i, '活动类型：对话'),
     )

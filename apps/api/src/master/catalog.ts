@@ -22,6 +22,10 @@ export type CatalogComponent = {
   userInput: string
   designRule: string
   keyFields: string
+  /** Catalog N: NA if unused; else frontend field + TBC */
+  displayImage: string
+  /** Catalog O: NA if unused; else frontend field + TBC */
+  videoPlay: string
   phases: PhaseId[]
   previewImages: string[]
 }
@@ -38,6 +42,8 @@ type CatalogRow = {
   K?: string
   L?: string
   M?: string
+  N?: string
+  O?: string
 }
 
 function masterRoot(): string {
@@ -112,6 +118,8 @@ export function loadCatalogComponents(): CatalogComponent[] {
       interaction: (r.K || '').trim(),
       userInput: (r.L || '').trim(),
       designRule: (r.M || '').trim(),
+      displayImage: (r.N || 'NA').trim() || 'NA',
+      videoPlay: (r.O || 'NA').trim() || 'NA',
       keyFields: keyFieldsFor(id),
       phases: phasesFor(id),
       previewImages: files.map(

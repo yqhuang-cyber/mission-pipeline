@@ -18,6 +18,35 @@ import {
 import { parseSteppedScript, type MappedStep } from '../validators/n2.js'
 import type { NodeEngineResult } from './n1.js'
 
+/**
+ * Kai 口播禁「— / –」：模板曾用它当英文停顿或词条分隔，TTS 会读坏或卡顿。
+ * 统一改成句号停顿；DisplayText / Step 标题不受此限。
+ */
+export function sanitizeKaiSpeech(text: string): string {
+  if (!text) return text
+  return text
+    .replace(/\s*[—–]+\s*/g, '. ')
+    .replace(/\.\s*\./g, '.')
+    .replace(/\s{2,}/g, ' ')
+    .replace(/^\.\s*/, '')
+    .trim()
+}
+
+function withKaiSpeechSanitized(row: N3Row): N3Row {
+  return {
+    ...row,
+    'Kai Script 1': sanitizeKaiSpeech(row['Kai Script 1']),
+    'Kai Script 2': sanitizeKaiSpeech(row['Kai Script 2']),
+    'Kai Feedback Script - Correct': sanitizeKaiSpeech(
+      row['Kai Feedback Script - Correct'],
+    ),
+    'Kai Feedback Script - Wrong': sanitizeKaiSpeech(
+      row['Kai Feedback Script - Wrong'],
+    ),
+    'Transition Script': sanitizeKaiSpeech(row['Transition Script']),
+  }
+}
+
 /** Schema / meta-model aligned row (13 fields) */
 export type N3Row = {
   Phase: string
@@ -70,6 +99,15 @@ function cmpName(id: string): string {
 function componentLabel(id: string): string {
   const name = cmpName(id)
   return name ? `${id} · ${name}` : id
+}
+
+function mediaDefault(
+  cmpOrLabel: string,
+  key: 'displayImage' | 'videoPlay',
+): string {
+  const id = /CMP-\d+/i.exec(cmpOrLabel)?.[0]?.toUpperCase() || cmpOrLabel
+  const v = getCatalogComponent(id)?.[key]
+  return v && v.trim() ? v : 'NA'
 }
 
 function phaseFull(phase: string): string {
@@ -380,6 +418,47 @@ function joinSpoken(parts: string[], max = 160): string {
   return withUserName(out.trim())
 }
 
+/**
+ * 观后选择题时间线：氛围开场 / 互动触发 / 收尾，互不复述。
+ * Script1 ← Hmm + Names. Countries. Friends. + A lot is happening
+ * Script2 ← How many did you catch? Tap one.
+ * Transition ← Keep the story… We'll come back…
+ */
+function splitPostWatchMcqTimeline(outline: string): {
+  leadIn: string
+  prompt: string
+  closing: string
+} {
+  const raw = (outline || '').replace(/\*\*/g, '')
+  const leadBits: string[] = []
+  if (/\bHmm\b\.?/i.test(raw)) leadBits.push('Hmm.')
+  if (/Names\.?\s*Countries\.?\s*Friends\.?/i.test(raw)) {
+    leadBits.push('Names. Countries. Friends.')
+  }
+  if (/A lot is happening\.?/i.test(raw)) leadBits.push('A lot is happening.')
+
+  let prompt = ''
+  if (/How many countries|how many did you|Student choices|Choices:/i.test(raw)) {
+    prompt = 'How many did you catch? Tap one.'
+  }
+
+  const closeBits: string[] = []
+  if (/Keep the story in mind/i.test(raw)) {
+    closeBits.push('Keep the story in mind.')
+  }
+  if (/We'?ll come back to it/i.test(raw)) {
+    closeBits.push("We'll come back to it.")
+  } else if (/We'?ll come back/i.test(raw)) {
+    closeBits.push("We'll come back to this.")
+  }
+
+  return {
+    leadIn: leadBits.join(' ').trim(),
+    prompt,
+    closing: closeBits.join(' ').trim(),
+  }
+}
+
 export function extractKnowledgePoint(
   outline: string,
   _purpose: string,
@@ -497,13 +576,20 @@ function buildKaiScript1(
 ): string {
   const id = cmpId.toUpperCase()
 
+  if (id === 'CMP-33' || id === 'CMP-02') {
+    const tl = splitPostWatchMcqTimeline(outline)
+    if (tl.leadIn) return tl.leadIn
+    // 有互动题但无氛围铺垫：开场别吞题干/选项/收尾
+    if (tl.prompt) return 'Hmm.'
+  }
+
   if (id === 'CMP-03') {
     const zh = extractReplayTargetZh(outline)
     if (/Replay|Freeze|Listen again/i.test(outline) && zh) {
       if (/once more|one word|new here/i.test(outline)) {
         return `Listen once more: ${zh}`
       }
-      return `Listen again — Tom says: ${zh}`
+      return `Listen again. Tom says: ${zh}`
     }
     const chunks = extractSpokenChunks(outline).filter(
       (c) => !/^(Perfect|Good|Nice|Exactly|Great)\b/i.test(c.trim()),
@@ -528,7 +614,7 @@ function buildKaiScript1(
   if (id === 'CMP-08') {
     const triple = extractVocabTriple(outline)
     if (triple) {
-      return `${triple.zh} — ${triple.pinyin} — ${triple.en}.`
+      return `${triple.zh}. ${triple.pinyin}. ${triple.en}.`
     }
     const hz = extractStudentZhLine(outline) || extractReplayTargetZh(outline)
     if (hz) return `Listen: ${hz}`
@@ -575,7 +661,7 @@ function buildKaiScript1(
       if (/他是___|ask about him|他是哪国/i.test(outline)) {
         return 'Now ask about him.'
       }
-      if (/Student\s+builds/i.test(outline)) return 'Your turn — build it.'
+      if (/Student\s+builds/i.test(outline)) return 'Your turn. Build it.'
     }
   }
 
@@ -597,7 +683,7 @@ function buildKaiScript1(
     if (/他是___|ask about him|他是哪国/i.test(outline)) {
       return 'Now ask about him.'
     }
-    return 'Your turn — build it.'
+    return 'Your turn. Build it.'
   }
   if (id === 'CMP-13') {
     if (/Look at them/i.test(outline)) return 'Look at them.'
@@ -613,6 +699,12 @@ function buildKaiScript1(
 
 function buildKaiScript2(outline: string, cmpId: string): string {
   const id = cmpId.toUpperCase()
+
+  if (id === 'CMP-33' || id === 'CMP-02') {
+    const tl = splitPostWatchMcqTimeline(outline)
+    if (tl.prompt) return tl.prompt
+  }
+
   if (id === 'CMP-12') return 'Build the question.'
   if (id === 'CMP-08') {
     const triple = extractVocabTriple(outline)
@@ -624,13 +716,13 @@ function buildKaiScript2(outline: string, cmpId: string): string {
     if (/不是|Say no/i.test(outline) && stu) {
       return `Say no: ${stu}`
     }
-    return stu || 'Your turn — say it.'
+    return stu || 'Your turn. Say it.'
   }
   if (id === 'CMP-15') {
     if (/asking her name|ask.*name/i.test(outline)) {
       return 'Start by asking her name.'
     }
-    return 'Your turn — say the line on the screen.'
+    return 'Your turn. Say the line on the screen.'
   }
   if (id === 'CMP-13') {
     const q =
@@ -656,13 +748,13 @@ function buildKaiScript2(outline: string, cmpId: string): string {
     return 'How many did you catch? Tap one.'
   }
   if (/跟读|listen and repeat|repeat/i.test(cleaned)) {
-    return 'Your turn — listen and repeat.'
+    return 'Your turn. Listen and repeat.'
   }
   if (/drag|match|拖|匹配/i.test(cleaned)) {
     return 'Now drag and match.'
   }
   void cmpId
-  return 'Your turn — try it.'
+  return 'Your turn. Try it.'
 }
 
 function buildFeedbackCorrect(outline: string, cmpId = ''): string {
@@ -679,7 +771,7 @@ function buildFeedbackCorrect(outline: string, cmpId = ''): string {
   if (/答\s*[ABC]|answer\s*[ABC]|正确|Exactly/i.test(outline)) {
     return 'Exactly.'
   }
-  return 'Good — keep that in mind.'
+  return 'Good. Keep that in mind.'
 }
 
 function buildFeedbackWrong(outline: string, cmpId = ''): string {
@@ -687,7 +779,7 @@ function buildFeedbackWrong(outline: string, cmpId = ''): string {
   if (id === 'CMP-08') {
     const triple = extractVocabTriple(outline)
     const hz = triple?.zh || 'it'
-    return `Not yet — listen again: ${hz}.`
+    return `Not yet. Listen again: ${hz}.`
   }
   if (id === 'CMP-35') {
     const stu = extractStudentZhLine(outline)
@@ -695,21 +787,26 @@ function buildFeedbackWrong(outline: string, cmpId = ''): string {
   }
   if (id === 'CMP-15') return 'Try the line on the screen.'
   if (id === 'CMP-13' && /朋友|Tom and Emma/i.test(outline)) {
-    return 'Not quite — look at Tom and Emma together.'
+    return 'Not quite. Look at Tom and Emma together.'
   }
   if (/听|listen|countries|国家/i.test(outline)) {
-    return 'Not yet — listen again for the key words.'
+    return 'Not yet. Listen again for the key words.'
   }
-  return 'Not quite — try once more.'
+  return 'Not quite. Try once more.'
 }
 
 function buildTransition(outline: string, _purpose: string, cmpId = ''): string {
   const id = cmpId.toUpperCase()
 
+  if (id === 'CMP-33' || id === 'CMP-02') {
+    const tl = splitPostWatchMcqTimeline(outline)
+    if (tl.closing) return tl.closing
+  }
+
   if (id === 'CMP-03') {
     if (/Freeze/i.test(outline)) return 'Freeze. Keep that line in mind.'
     if (/one word|new here|Listen for/i.test(outline)) {
-      return 'One word is new here — listen for it.'
+      return 'One word is new here. Listen for it.'
     }
   }
   if (id === 'CMP-09') {
@@ -744,7 +841,7 @@ function buildTransition(outline: string, _purpose: string, cmpId = ''): string 
     const last = chunks[chunks.length - 1]
     if (last && !/^(Good|Perfect)\b/i.test(last)) return shortSnippet(last, 120)
     const stu = extractStudentZhLine(outline)
-    if (stu && /她是我的朋友/.test(stu)) return 'Nice — you said it about Emma.'
+    if (stu && /她是我的朋友/.test(stu)) return 'Nice. You said it about Emma.'
   }
   if (id === 'CMP-15') {
     if (/Emma smiles/i.test(outline)) {
@@ -811,7 +908,7 @@ export function buildHeuristicRow(input: {
       missionGoals: input.missionGoals,
     },
   )
-  return {
+  return withKaiSpeechSanitized({
     Phase: phaseFull(input.phase),
     'Script Step': `${input.scriptStep} · ${input.scriptName}`.trim(),
     Step: buildStepLabel(
@@ -824,8 +921,8 @@ export function buildHeuristicRow(input: {
     ),
     Component: componentLabel(input.cmpId),
     DisplayText: displayText,
-    'Display Image': '',
-    'Video Play': '',
+    'Display Image': mediaDefault(input.cmpId, 'displayImage'),
+    'Video Play': mediaDefault(input.cmpId, 'videoPlay'),
     'Kai Script 1': buildKaiScript1(
       input.outline,
       input.purpose,
@@ -850,7 +947,7 @@ export function buildHeuristicRow(input: {
       input.purpose,
       input.knowledge,
     ),
-  }
+  })
 }
 
 function escapeCell(s: string): string {
@@ -896,10 +993,10 @@ export function renderPhaseFile(
   const blocks: string[] = [
     `# ${missionName} — Component Content (v0.4) — ${phase}`,
     ``,
-    `> **版本**: v0.4.4`,
+    `> **版本**: v0.4.5`,
     `> **Schema**: master/mission_spec_schema.csv（13 字段）`,
     `> **Meta**: master/mission_phase_step_meta_model.md`,
-    `> **规则**: Display Text 按 catalog E 列；【】缺料→[待补]；[]→NA；模版=无→NA；Image/Video 留空`,
+    `> **规则**: Display Text 按 catalog E 列；【】缺料→[待补]；[]→NA；模版=无→NA；Image/Video 按 catalog N/O（NA 或 字段+TBC）`,
     `> **Phase**: ${full}`,
     ``,
     `---`,
@@ -1032,7 +1129,7 @@ export function rebuildV04FromEditRows(
   const parts: string[] = [
     `# ${missionName} — v0.4 component content (bundle)`,
     ``,
-    `> P1–P4 合集；13 字段对齐 mission_spec_schema / meta model v0.4.4；1 Component = 1 Step = 1 行`,
+    `> P1–P4 合集；13 字段对齐 mission_spec_schema / meta model v0.4.5；1 Component = 1 Step = 1 行`,
     `> edited: draft save`,
     ``,
   ]
@@ -1066,12 +1163,14 @@ export function rebuildV04FromEditRows(
 
 const N3_SYSTEM = `你是中文教学 Mission Pipeline 的 N3（Content 填充）助手。
 根据 v0.3 的 component + content outline + catalog 模版，为每一行生成字段。
-严格遵守 master/mission_phase_step_meta_model.md v0.4.4：
+严格遵守 master/mission_phase_step_meta_model.md v0.4.5：
 - Phase 用全称；Script Step 继承 v0.3；Step=v0.3.1 的 activity 标题（已给出 activityTitle，不要改写）；Component=CMP-XX · 简称
 - Display Text 必须符合 E 列模版结构；【】不得用 NA（缺料写 [待补: …]）；不要编造 outline 没有的答案
+- CMP-13 选项按 outline 实际条数填写（至少 2 个）；不要用 NA 把 A/B/C 凑满；缺项写 [待补: 选项]
 - 填 DisplayText 时按 **组件类型** 解析 outline（选择题≠学习目标≠视频叠字）；对照 F 示例 chrome 与 M 设计规范；选项/答案语义正确（单选答案仅一字母）
-- Display Image / Video Play 必须空字符串
-- Kai Script 1/2 与 Transition Script 必须是 Kai 老师口播（可中英混），禁止组件名/教学目的/「视频播放」等标注；姓名用 [User Name]
+- Display Image / Video Play 从 catalog N/O 列带出默认值（不需要媒体写 NA；需要则写前端字段名+TBC）；不要改成空字符串
+- Kai Script 1/2、Feedback、Transition Script 必须是 Kai 老师口播（可中英混），禁止组件名/教学目的/「视频播放」等标注；姓名用 [User Name]
+- 口播里禁止使用破折号「—」或「–」（TTS 会读坏）；停顿用句号或逗号
 - 有学生作答互动才填 Script 2 / Feedback；纯观看/继续按钮则 Script2+Feedback 留空
 - Knowledge point 只写本行 outline 实际出现的 Word/Pattern（来自 v0.2 元信息库）；禁止把整课词汇/句型抄进每一步；格式 Word:/Pattern:
 只输出 JSON 数组，每项含 keys: scriptStep(number), componentId, displayText, kaiScript1, kaiScript2, feedbackCorrect, feedbackWrong, transitionScript, knowledgePoint。
@@ -1136,9 +1235,9 @@ function applyPatch(
   if (patch.knowledgePoint?.trim()) {
     next['Knowledge point'] = patch.knowledgePoint.trim()
   }
-  next['Display Image'] = ''
-  next['Video Play'] = ''
-  return next
+  next['Display Image'] = mediaDefault(next.Component, 'displayImage')
+  next['Video Play'] = mediaDefault(next.Component, 'videoPlay')
+  return withKaiSpeechSanitized(next)
 }
 
 /** @deprecated use parseSteppedScript — kept for tests */
@@ -1294,7 +1393,7 @@ export async function runN3(input: {
   const parts: string[] = [
     `# ${input.missionName} — v0.4 component content (bundle)`,
     ``,
-    `> P1–P4 合集；13 字段对齐 mission_spec_schema / meta model v0.4.4；1 Component = 1 Step = 1 行`,
+    `> P1–P4 合集；13 字段对齐 mission_spec_schema / meta model v0.4.5；1 Component = 1 Step = 1 行`,
     `> provider: ${provider}${fallbackReason ? ` · fallback: ${fallbackReason.slice(0, 120)}` : ''}`,
     ``,
   ]
@@ -1338,9 +1437,9 @@ export async function runN3(input: {
       targetType: 'mission',
       type: 'confirm',
       severity: 'info',
-      question: `Checkpoint：已生成 ${total} 行（13 字段）。请核对 Display Text / Kai 脚本 / KP；Image·Video 留给 CD。`,
+      question: `Checkpoint：已生成 ${total} 行（13 字段）。请核对 Display Text / Kai 脚本 / KP；Image·Video 为 catalog 默认（NA 或字段+TBC）。`,
       options: [{ id: 'ack', label: '已开始核对', recommended: true }],
-      aiRationale: 'mission_phase_step_meta_model v0.4.4',
+      aiRationale: 'mission_phase_step_meta_model v0.4.5',
     })
   }
 

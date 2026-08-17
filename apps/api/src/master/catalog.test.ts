@@ -19,7 +19,24 @@ describe('master catalog for v0.3 editor', () => {
     expect(c33?.template).toMatch(/【题目】|【题干】/)
     expect(c33?.phases).toContain('P1')
     expect(c33?.keyFields).toBe(keyFieldsFor('CMP-33'))
+    expect(c33?.displayImage).toBe('NA')
+    expect(c33?.videoPlay).toBe('NA')
     expect(c33?.previewImages?.[0]).toMatch(/CMP-33/)
+    const c03 = components.find((c) => c.id === 'CMP-03')
+    expect(c03?.displayImage).toBe('NA')
+    expect(c03?.videoPlay).toBe('video.objectKey+TBC')
+    const c09 = components.find((c) => c.id === 'CMP-09')
+    expect(c09?.displayImage).toBe('imageUrl+TBC')
+    expect(c09?.videoPlay).toBe('NA')
+    const c01 = components.find((c) => c.id === 'CMP-01')
+    expect(c01?.displayImage).toBe('heroImage.url+TBC')
+    expect(c01?.videoPlay).toBe('backgroundVideo.objectKey+TBC')
+    expect(components.every((c) => /^(NA|.+\+TBC)$/.test(c.displayImage))).toBe(
+      true,
+    )
+    expect(components.every((c) => /^(NA|.+\+TBC)$/.test(c.videoPlay))).toBe(
+      true,
+    )
     expect(phaseAllowed.P1).toContain('CMP-33')
     expect(phaseAllowed.P1).toContain('CMP-19')
     expect(phaseAllowed.P4).toContain('CMP-03')
@@ -83,6 +100,23 @@ describe('master catalog for v0.3 editor', () => {
     expect(dt).toMatch(/【C】\s*If Tom is a teacher/)
     expect(dt).toMatch(/【答案】\s*B/)
     expect(dt).not.toMatch(/【答案】\s*\[待补/)
+  })
+
+  it('CMP-13 emits only real options, never NA padding, at least two', () => {
+    const two =
+      'Highlight:\n名字\nKai asks:\n你叫什么名字？\n**Choices:**\nA. Name\nB. Country\n**Student chooses:**\nName'
+    const dt2 = fillDisplayTextTemplate('CMP-13', two, '听辨')
+    expect(dt2).toMatch(/【A】\s*Name/)
+    expect(dt2).toMatch(/【B】\s*Country/)
+    expect(dt2).not.toMatch(/【C】/)
+    expect(dt2).not.toMatch(/【[ABCD]】\s*NA/)
+
+    const one = 'Highlight:\n朋友\nKai:\nWhat do you think 朋友 means?\nChoices:\nA. Friend\nStudent chooses A.'
+    const dt1 = fillDisplayTextTemplate('CMP-13', one, '猜词')
+    expect(dt1).toMatch(/【A】\s*Friend/)
+    expect(dt1).toMatch(/【B】\s*\[待补: 选项\]/)
+    expect(dt1).not.toMatch(/【C】/)
+    expect(dt1).not.toMatch(/【[ABCD]】\s*NA/)
   })
 
   it('parses Student selects text answer and Screen blank prompt (CMP-13)', () => {

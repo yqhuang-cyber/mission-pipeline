@@ -257,6 +257,13 @@ export function fillDisplayTextTemplate(
       analyzed,
       exampleByLabel,
     })
+    if (
+      cmp.toUpperCase() === 'CMP-13' &&
+      /^【[ABCD]】$/.test(label) &&
+      !value.trim()
+    ) {
+      continue
+    }
     out.push(formatLabeledLine(prefix, value))
   }
 
@@ -482,8 +489,9 @@ function resolveSlotValue(args: {
     if (optLetter) {
       const L = optLetter.toUpperCase() as 'A' | 'B' | 'C' | 'D'
       const val = a.choice.options[L]
-      // Reasonableness: option should be short content, not narrative dump
       if (val && isReasonableOption(val)) return val
+      // CMP-13: 不按模版用 NA 凑 A/B/C；缺项交给 sanitize 决定是否 [待补]
+      if (args.cmp.toUpperCase() === 'CMP-13') return ''
       return 'NA'
     }
     if (
@@ -606,7 +614,7 @@ function sanitizeDisplayText(
   lines = lines.map((line) => {
     const m = /^(【[ABCD]】)\s*(.*)$/.exec(line)
     if (m && m[2] && !isReasonableOption(m[2])) {
-      return `${m[1]} NA`
+      return cmp.toUpperCase() === 'CMP-13' ? '' : `${m[1]} NA`
     }
     // Question must not contain Student choices blob
     if (/^【题目】/.test(line) && /Student choices/i.test(line)) {
@@ -615,6 +623,11 @@ function sanitizeDisplayText(
     }
     return line
   })
+  lines = lines.filter((l) => l.trim().length > 0)
+
+  if (cmp.toUpperCase() === 'CMP-13') {
+    lines = pruneCmp13Options(lines)
+  }
 
   // Single-choice: answer must be one letter if present
   if (family === 'single-choice') {
@@ -633,6 +646,52 @@ function sanitizeDisplayText(
   void a.designRule
 
   return lines.join('\n').trim()
+}
+
+/**
+ * CMP-13: keep only real options from outline; never pad with NA.
+ * At least 2 options — missing slots use [待补: 选项].
+ */
+function pruneCmp13Options(lines: string[]): string[] {
+  const letters = ['A', 'B', 'C', 'D'] as const
+  const found: Partial<Record<(typeof letters)[number], string>> = {}
+  for (const line of lines) {
+    const m = /^【([ABCD])】\s*(.*)$/.exec(line)
+    if (!m) continue
+    const L = m[1]!.toUpperCase() as (typeof letters)[number]
+    const val = (m[2] || '').trim()
+    if (val && val !== 'NA' && isReasonableOption(val)) found[L] = val
+  }
+
+  const ordered = letters
+    .filter((L) => found[L])
+    .map((L) => ({ L, val: found[L]! }))
+  while (ordered.length < 2) {
+    const next = letters[ordered.length]!
+    ordered.push({ L: next, val: '[待补: 选项]' })
+  }
+
+  const out: string[] = []
+  let optionsInserted = false
+  for (const line of lines) {
+    if (/^【[ABCD]】/.test(line)) {
+      if (!optionsInserted) {
+        for (const o of ordered) {
+          out.push(`【${o.L}】 ${o.val}`)
+        }
+        optionsInserted = true
+      }
+      continue
+    }
+    out.push(line)
+  }
+  if (!optionsInserted) {
+    const ansIdx = out.findIndex((l) => /^【答案】/.test(l))
+    const block = ordered.map((o) => `【${o.L}】 ${o.val}`)
+    if (ansIdx >= 0) out.splice(ansIdx, 0, ...block)
+    else out.push(...block)
+  }
+  return out
 }
 
 function isReasonableOption(val: string): boolean {

@@ -18,7 +18,7 @@ import {
   activityTitlesFromV031,
   type V031Document,
 } from '../nodes/n2ActivityAnalysis.js'
-import { runN3, parseV04BundleToEditRows, rebuildV04FromEditRows, type N3EditRow, type N3Row, N3_FIELD_ORDER } from '../nodes/n3.js'
+import { runN3, parseV04BundleToEditRows, rebuildV04FromEditRows, type N3EditRow, type N3Row, N3_FIELD_ORDER, sanitizeKaiSpeech } from '../nodes/n3.js'
 import {
   runN4,
   n4ExportPaths,
@@ -963,15 +963,17 @@ export async function saveN3Structured(
       DisplayText: String(incoming.DisplayText ?? 'NA'),
       'Display Image': String(incoming['Display Image'] ?? ''),
       'Video Play': String(incoming['Video Play'] ?? ''),
-      'Kai Script 1': String(incoming['Kai Script 1'] ?? ''),
-      'Kai Script 2': String(incoming['Kai Script 2'] ?? ''),
-      'Kai Feedback Script - Correct': String(
-        incoming['Kai Feedback Script - Correct'] ?? '',
+      'Kai Script 1': sanitizeKaiSpeech(String(incoming['Kai Script 1'] ?? '')),
+      'Kai Script 2': sanitizeKaiSpeech(String(incoming['Kai Script 2'] ?? '')),
+      'Kai Feedback Script - Correct': sanitizeKaiSpeech(
+        String(incoming['Kai Feedback Script - Correct'] ?? ''),
       ),
-      'Kai Feedback Script - Wrong': String(
-        incoming['Kai Feedback Script - Wrong'] ?? '',
+      'Kai Feedback Script - Wrong': sanitizeKaiSpeech(
+        String(incoming['Kai Feedback Script - Wrong'] ?? ''),
       ),
-      'Transition Script': String(incoming['Transition Script'] ?? ''),
+      'Transition Script': sanitizeKaiSpeech(
+        String(incoming['Transition Script'] ?? ''),
+      ),
       'Knowledge point': String(incoming['Knowledge point'] ?? ''),
     }
     return {
