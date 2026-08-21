@@ -23,6 +23,10 @@ export function useApi() {
     if (options.body != null) {
       headers['Content-Type'] = headers['Content-Type'] || 'application/json'
     }
+    if (import.meta.server) {
+      const incoming = useRequestHeaders(['cookie'])
+      if (incoming.cookie) headers.cookie = incoming.cookie
+    }
 
     const base = resolveBase()
     const url = `${base}${path.startsWith('/') ? path : `/${path}`}`
@@ -31,6 +35,7 @@ export function useApi() {
       res = await fetch(url, {
         ...options,
         headers,
+        credentials: 'include',
       })
     } catch (err) {
       const hint =

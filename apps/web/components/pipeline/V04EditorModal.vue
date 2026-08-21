@@ -258,7 +258,8 @@ onUnmounted(() => window.removeEventListener('keydown', onKey))
   position: fixed;
   inset: 0;
   z-index: 80;
-  background: rgba(0, 0, 0, 0.45);
+  background: #0e1f1a73;
+  backdrop-filter: blur(4px);
   display: grid;
   place-items: center;
   padding: 1rem;
@@ -266,13 +267,14 @@ onUnmounted(() => window.removeEventListener('keydown', onKey))
 .modal {
   width: min(1100px, 96vw);
   max-height: min(92vh, 920px);
-  background: var(--bg, #fff);
-  color: var(--fg, #111);
-  border-radius: 12px;
+  background: var(--mp-surface);
+  color: var(--mp-text);
+  border-radius: var(--mp-radius-card);
+  border: 1px solid var(--mp-divider);
   display: flex;
   flex-direction: column;
   overflow: hidden;
-  box-shadow: 0 20px 50px rgba(0, 0, 0, 0.25);
+  box-shadow: var(--mp-shadow-pop);
 }
 .head {
   display: flex;

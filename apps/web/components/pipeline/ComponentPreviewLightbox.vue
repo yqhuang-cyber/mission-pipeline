@@ -68,8 +68,8 @@ onUnmounted(() => window.removeEventListener('keydown', onKey))
   width: min(920px, 100%);
   max-height: 92vh;
   overflow: auto;
-  background: #fffaf2;
-  border-radius: 0.75rem;
+  background: var(--mp-surface);
+  border-radius: var(--mp-radius-card);
   border: 1px solid var(--line);
   box-shadow: 0 20px 60px rgba(0, 0, 0, 0.25);
 }

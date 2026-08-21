@@ -18,19 +18,18 @@ const html = computed(() =>
 
 <template>
   <div class="page">
-    <div class="head">
-      <div>
-        <p class="eyebrow muted mono">Master data</p>
-        <h1>MissionMetaModel</h1>
-        <p class="muted mono">
+    <header class="page-header">
+      <div class="page-header__meta">
+        <p class="page-eyebrow">Schema</p>
+        <h1 class="page-title">Mission Meta Model</h1>
+        <p class="page-subtitle mono">
           {{ data?.file || 'mission_phase_step_meta_model.md' }}
         </p>
       </div>
-      <div class="head-actions">
-        <NuxtLink class="btn" to="/missions">← Missions</NuxtLink>
+      <div class="page-header__actions">
         <button type="button" class="btn" @click="refresh()">刷新</button>
       </div>
-    </div>
+    </header>
 
     <p v-if="pending" class="muted">加载中…</p>
     <p v-else-if="error" class="err">{{ error.message || error }}</p>
@@ -39,31 +38,6 @@ const html = computed(() =>
 </template>
 
 <style scoped>
-.head {
-  display: flex;
-  justify-content: space-between;
-  align-items: flex-start;
-  gap: 1rem;
-  margin-bottom: 1.25rem;
-}
-.head-actions {
-  display: flex;
-  gap: 0.5rem;
-  flex-shrink: 0;
-}
-.eyebrow {
-  margin: 0 0 0.25rem;
-  font-size: 0.8rem;
-  letter-spacing: 0.04em;
-  text-transform: uppercase;
-}
-h1 {
-  margin: 0 0 0.35rem;
-  font-size: 1.85rem;
-}
-.err {
-  color: var(--danger);
-}
 .md {
   max-width: 52rem;
   line-height: 1.55;
@@ -80,7 +54,7 @@ h1 {
 .md :deep(h2) {
   font-size: 1.25rem;
   margin-top: 1.75rem;
-  border-bottom: 1px solid var(--line);
+  border-bottom: 1px solid var(--mp-divider);
   padding-bottom: 0.35rem;
 }
 .md :deep(h3) {
@@ -95,19 +69,23 @@ h1 {
 }
 .md :deep(th),
 .md :deep(td) {
-  border: 1px solid var(--line);
+  border: 1px solid var(--mp-border);
   padding: 0.4rem 0.55rem;
   vertical-align: top;
   text-align: left;
 }
 .md :deep(th) {
-  background: rgba(15, 107, 92, 0.06);
+  background: #2d6a4f0f;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  font-size: 0.78rem;
+  color: var(--mp-text-muted);
 }
 .md :deep(pre) {
-  background: #1c1915;
+  background: var(--mp-sider-bg);
   color: #f3efe6;
   padding: 0.85rem 1rem;
-  border-radius: 0.5rem;
+  border-radius: var(--mp-radius-soft);
   overflow-x: auto;
   font-size: 0.85rem;
 }
@@ -116,14 +94,14 @@ h1 {
   font-size: 0.88em;
 }
 .md :deep(:not(pre) > code) {
-  background: rgba(28, 25, 21, 0.06);
+  background: var(--mp-surface-tint);
   padding: 0.1em 0.35em;
   border-radius: 0.25rem;
 }
 .md :deep(blockquote) {
   margin: 0.75rem 0;
   padding: 0.35rem 0.9rem;
-  border-left: 3px solid var(--brand);
-  color: var(--muted);
+  border-left: 3px solid var(--mp-primary);
+  color: var(--mp-text-muted);
 }
 </style>

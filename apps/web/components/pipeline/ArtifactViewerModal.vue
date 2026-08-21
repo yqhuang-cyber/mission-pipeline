@@ -111,7 +111,7 @@ onUnmounted(() => window.removeEventListener('keydown', onKey))
   position: fixed;
   inset: 0;
   z-index: 1000;
-  background: rgba(28, 25, 21, 0.45);
+  background: #0e1f1a73;
   backdrop-filter: blur(4px);
   display: grid;
   place-items: center;
@@ -120,10 +120,10 @@ onUnmounted(() => window.removeEventListener('keydown', onKey))
 .modal {
   width: min(1200px, 100%);
   height: min(90vh, 920px);
-  background: #fffaf2;
+  background: var(--mp-surface);
   border: 1px solid var(--line);
-  border-radius: 0.85rem;
-  box-shadow: 0 24px 80px rgba(28, 25, 21, 0.22);
+  border-radius: var(--mp-radius-card);
+  box-shadow: var(--mp-shadow-pop);
   display: grid;
   grid-template-rows: auto 1fr;
   overflow: hidden;
@@ -161,7 +161,7 @@ onUnmounted(() => window.removeEventListener('keydown', onKey))
   border-right: 1px solid var(--line);
   overflow: auto;
   padding: 0.85rem 0.75rem;
-  background: #f3ebe0;
+  background: var(--mp-surface-tint);
 }
 .toc-title {
   margin: 0 0 0.6rem;

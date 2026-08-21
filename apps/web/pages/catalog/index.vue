@@ -73,21 +73,20 @@ function pick(id: string) {
 
 <template>
   <div class="page">
-    <div class="head">
-      <div>
-        <p class="eyebrow muted mono">Master data</p>
-        <h1>Component Catalog</h1>
-        <p class="muted">
+    <header class="page-header">
+      <div class="page-header__meta">
+        <p class="page-eyebrow">Components</p>
+        <h1 class="page-title">Component Catalog</h1>
+        <p class="page-subtitle">
           {{ data?.meta?.version || 'catalog' }}
           <span v-if="data?.meta?.source"> · {{ data.meta.source }}</span>
           · {{ data?.components?.length || 0 }} components
         </p>
       </div>
-      <div class="head-actions">
-        <NuxtLink class="btn" to="/missions">← Missions</NuxtLink>
+      <div class="page-header__actions">
         <button type="button" class="btn" @click="refresh()">刷新</button>
       </div>
-    </div>
+    </header>
 
     <p v-if="pending" class="muted">加载中…</p>
     <p v-else-if="error" class="err">{{ error.message || error }}</p>
@@ -201,21 +200,6 @@ function pick(id: string) {
 </template>
 
 <style scoped>
-.head {
-  display: flex;
-  justify-content: space-between;
-  align-items: flex-start;
-  gap: 1rem;
-  margin-bottom: 1.1rem;
-}
-.eyebrow {
-  margin: 0;
-  font-size: 0.75rem;
-  letter-spacing: 0.05em;
-  text-transform: uppercase;
-}
-h1 { margin: 0.15rem 0 0.25rem; }
-.head-actions { display: flex; gap: 0.4rem; }
 .layout {
   display: grid;
   grid-template-columns: 280px 1fr;
@@ -225,19 +209,14 @@ h1 { margin: 0.15rem 0 0.25rem; }
   min-height: 70vh;
 }
 .side {
-  border-right: 1px solid var(--line);
-  background: #f3ebe0;
+  border-right: 1px solid var(--mp-divider);
+  background: var(--mp-surface-tint);
   display: grid;
   grid-template-rows: auto 1fr;
   min-height: 0;
 }
 .search {
   margin: 0.75rem;
-  font: inherit;
-  padding: 0.45rem 0.6rem;
-  border: 1px solid var(--line);
-  border-radius: 0.35rem;
-  background: #fff;
 }
 .list {
   overflow: auto;
@@ -260,7 +239,8 @@ h1 { margin: 0.15rem 0 0.25rem; }
 }
 .item:hover,
 .item.active {
-  background: rgba(15, 107, 92, 0.12);
+  background: #2d6a4f1a;
+  box-shadow: inset 3px 0 0 var(--mp-primary);
 }
 .id { color: var(--muted); font-size: 0.8rem; }
 .detail {
@@ -292,9 +272,9 @@ h1 { margin: 0.15rem 0 0.25rem; }
   border: 1px solid var(--line);
 }
 .chip.phase {
-  background: rgba(15, 107, 92, 0.12);
-  border-color: var(--brand);
-  color: var(--brand-ink);
+  background: #2d6a4f14;
+  border-color: #2d6a4f44;
+  color: var(--mp-primary-deep);
 }
 .muted-chip { color: var(--muted); }
 .grid {
@@ -304,10 +284,10 @@ h1 { margin: 0.15rem 0 0.25rem; }
   margin-bottom: 0.85rem;
 }
 .block {
-  border: 1px solid var(--line);
-  border-radius: 0.45rem;
+  border: 1px solid var(--mp-divider);
+  border-radius: var(--mp-radius-soft);
   padding: 0.75rem 0.85rem;
-  background: #fffdf8;
+  background: var(--mp-surface);
   margin-bottom: 0.75rem;
 }
 .block h3 {

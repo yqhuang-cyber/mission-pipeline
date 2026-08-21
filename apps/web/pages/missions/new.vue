@@ -30,24 +30,44 @@ async function submit() {
 
 <template>
   <div class="page">
-    <h1>新建 Mission</h1>
-    <p class="muted">粘贴口语化 mission script（v0.1 colloquial script），进入 Pipeline Canvas。</p>
+    <header class="page-header">
+      <div class="page-header__meta">
+        <p class="page-eyebrow">Pipeline</p>
+        <h1 class="page-title">New Mission</h1>
+        <p class="page-subtitle">
+          粘贴口语化 mission script（v0.1），进入 Pipeline Canvas。
+        </p>
+      </div>
+      <div class="page-header__actions">
+        <NuxtLink class="btn" to="/missions">← 返回列表</NuxtLink>
+      </div>
+    </header>
 
     <form class="card form" @submit.prevent="submit">
       <label>
-        Name
-        <input v-model="form.name" required maxlength="100" placeholder="Mission 5 — …" />
+        <span class="lab">Name</span>
+        <input
+          v-model="form.name"
+          required
+          maxlength="100"
+          placeholder="Mission 5 — …"
+        />
       </label>
       <label>
-        Topic
-        <input v-model="form.topic" required maxlength="200" placeholder="教学主题" />
+        <span class="lab">Topic</span>
+        <input
+          v-model="form.topic"
+          required
+          maxlength="200"
+          placeholder="教学主题"
+        />
       </label>
       <label>
-        Owner
+        <span class="lab">Owner</span>
         <input v-model="form.ownerName" required />
       </label>
       <label>
-        Colloquial script (v0.1)
+        <span class="lab">Colloquial script (v0.1)</span>
         <textarea
           v-model="form.scriptMd"
           required
@@ -55,23 +75,41 @@ async function submit() {
           placeholder="粘贴口语化 script markdown…"
         />
       </label>
-      <p v-if="error" class="err">{{ error }}</p>
-      <button class="primary" type="submit" :disabled="submitting">
-        {{ submitting ? '创建中…' : '创建并打开 Canvas' }}
-      </button>
+      <p v-if="error" class="err banner">{{ error }}</p>
+      <div class="form-actions">
+        <NuxtLink class="btn" to="/missions">取消</NuxtLink>
+        <button class="primary" type="submit" :disabled="submitting">
+          {{ submitting ? '创建中…' : '创建并打开 Canvas' }}
+        </button>
+      </div>
     </form>
   </div>
 </template>
 
 <style scoped>
-.form { display: grid; gap: 1rem; margin-top: 1rem; }
-label { display: grid; gap: 0.35rem; font-size: 0.95rem; }
-input, textarea {
-  font: inherit;
-  padding: 0.65rem 0.75rem;
-  border: 1px solid var(--line);
-  border-radius: 0.4rem;
-  background: #fff;
+.form {
+  display: grid;
+  gap: 1rem;
 }
-.err { color: var(--danger); margin: 0; }
+label {
+  display: grid;
+  gap: 0.35rem;
+}
+.lab {
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--mp-text-muted);
+}
+.banner {
+  margin: 0;
+  padding: 0.65rem 0.85rem;
+  border-radius: var(--mp-radius-soft);
+  background: var(--mp-danger-bg);
+  border: 1px solid #e5484d38;
+}
+.form-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 0.5rem;
+}
 </style>

@@ -230,12 +230,12 @@ watch(
 
 <template>
   <div v-if="open" class="overlay" @click.self="emit('close')">
-    <div class="modal card">
+    <div class="modal" role="dialog" aria-modal="true">
       <header class="head">
         <div>
-          <p class="eyebrow muted">V0.3.1 · 教学活动分析</p>
+          <p class="eyebrow">V0.3.1 · 教学活动分析</p>
           <h2>{{ missionName || 'Activity selection' }}</h2>
-          <p class="muted small">
+          <p class="head-sub">
             可增删活动、微调描述；每个 activity 选 1 个 component。Confirm 后生成 v0.3。
           </p>
         </div>
@@ -243,10 +243,11 @@ watch(
       </header>
 
       <p v-if="error" class="err">{{ error }}</p>
-      <p v-if="loading" class="muted">加载中…</p>
+      <p v-if="loading" class="loading muted">加载中…</p>
 
       <div v-else class="body">
-        <aside class="steps">
+        <aside class="rail">
+          <p class="rail-label">Script steps</p>
           <button
             v-for="(s, i) in steps"
             :key="s.scriptStep"
@@ -255,15 +256,25 @@ watch(
             :class="{ active: i === selectedStepIdx }"
             @click="selectedStepIdx = i"
           >
-            <span class="mono">{{ s.phase }} · {{ s.scriptStep }}</span>
-            <span>{{ s.name }}</span>
-            <span class="muted small">{{ s.activities.length }} activities</span>
+            <span class="step-meta">
+              <span class="step-phase">{{ s.phase }}</span>
+              <span class="step-num mono">{{ s.scriptStep }}</span>
+            </span>
+            <span class="step-name">{{ s.name }}</span>
+            <span class="step-count">{{ s.activities.length }} activities</span>
           </button>
         </aside>
 
         <section v-if="current" class="detail">
-          <h3>script_step {{ current.scriptStep }}. {{ current.name }}</h3>
-          <p v-if="current.purpose" class="purpose">教学目的：{{ current.purpose }}</p>
+          <div class="detail-head">
+            <h3>
+              script_step {{ current.scriptStep }}. {{ current.name }}
+            </h3>
+            <p v-if="current.purpose" class="purpose">
+              <span class="purpose-lab">教学目的</span>
+              {{ current.purpose }}
+            </p>
+          </div>
 
           <article
             v-for="(a, ai) in current.activities"
@@ -435,73 +446,179 @@ watch(
 .overlay {
   position: fixed;
   inset: 0;
-  background: rgba(20, 18, 16, 0.45);
+  background: #0e1f1a73;
+  backdrop-filter: blur(4px);
   z-index: 1100;
   display: grid;
   place-items: center;
   padding: 1rem;
 }
 .modal {
-  width: min(1100px, 100%);
-  max-height: min(90vh, 900px);
+  width: min(1120px, 100%);
+  max-height: min(92vh, 920px);
   display: flex;
   flex-direction: column;
   overflow: hidden;
+  background: var(--mp-surface);
+  border: 1px solid var(--mp-divider);
+  border-radius: var(--mp-radius-card);
+  box-shadow: var(--mp-shadow-pop);
 }
 .head {
   display: flex;
   justify-content: space-between;
   gap: 1rem;
-  padding-bottom: 0.75rem;
-  border-bottom: 1px solid var(--border, #ddd);
+  padding: 1rem 1.25rem;
+  border-bottom: 1px solid var(--mp-divider);
+  background: var(--mp-surface);
+  flex-shrink: 0;
 }
 .eyebrow {
   margin: 0;
-  font-size: 0.75rem;
-  letter-spacing: 0.04em;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.18em;
   text-transform: uppercase;
+  color: var(--mp-accent);
 }
-h2 {
-  margin: 0.2rem 0;
+.head h2 {
+  margin: 0.2rem 0 0;
+  font-size: 1.25rem;
+  color: var(--mp-text);
+}
+.head-sub {
+  margin: 0.35rem 0 0;
+  font-size: 0.85rem;
+  color: var(--mp-text-muted);
+  max-width: 52ch;
+}
+.loading {
+  margin: 0;
+  padding: 1.25rem;
 }
 .body {
   display: grid;
-  grid-template-columns: 220px 1fr;
-  gap: 0.75rem;
+  grid-template-columns: 268px 1fr;
   overflow: hidden;
   flex: 1;
   min-height: 0;
-  padding: 0.75rem 0;
+  background: var(--mp-canvas);
 }
-.steps {
+.rail {
   overflow: auto;
-  display: grid;
-  gap: 0.35rem;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
   align-content: start;
+  padding: 14px 12px;
+  background: linear-gradient(180deg, #ebe4d4, var(--mp-canvas-warm));
+  border-right: 1px solid var(--mp-border);
+  box-shadow: inset -8px 0 16px -16px #141e1929;
+}
+.rail-label {
+  margin: 0 4px 8px;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: var(--mp-text-soft);
 }
 .step {
   text-align: left;
   display: grid;
-  gap: 0.1rem;
-  padding: 0.5rem 0.6rem;
+  gap: 4px;
+  padding: 10px 12px;
+  border-radius: 12px;
+  border: 1px solid transparent;
+  background: transparent;
+  color: var(--mp-text);
+  box-shadow: none;
+  transition: background 0.15s, border-color 0.15s, box-shadow 0.15s;
+}
+.step:hover {
+  background: #ffffff8c;
+  border-color: var(--mp-border);
 }
 .step.active {
-  border-color: var(--brand);
+  background: var(--mp-surface);
+  border-color: #2d6a4f55;
+  box-shadow:
+    inset 3px 0 0 var(--mp-primary),
+    0 1px 0 #141e190a,
+    0 8px 18px -14px #141e1938;
+}
+.step-meta {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.step-phase {
+  display: inline-grid;
+  place-items: center;
+  min-width: 28px;
+  height: 22px;
+  padding: 0 6px;
+  border-radius: 999px;
+  font-size: 10px;
+  font-weight: 800;
+  letter-spacing: 0.04em;
+  color: var(--mp-accent);
+  background: #f5a4001f;
+  border: 1px solid #f5a40044;
+}
+.step-num {
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--mp-text-soft);
+}
+.step-name {
+  font-size: 13px;
+  font-weight: 700;
+  line-height: 1.35;
+  color: var(--mp-text);
+}
+.step-count {
+  font-size: 11px;
+  color: var(--mp-text-muted);
 }
 .detail {
   overflow: auto;
-  padding-right: 0.25rem;
+  padding: 18px 22px 24px;
+  background: var(--mp-surface);
+  box-shadow: -12px 0 28px -24px #141e1933;
+}
+.detail-head {
+  margin-bottom: 14px;
+  padding-bottom: 12px;
+  border-bottom: 1px solid var(--mp-divider);
+}
+.detail-head h3 {
+  margin: 0;
+  font-size: 1.05rem;
+  color: var(--mp-text);
 }
 .purpose {
-  margin: 0.35rem 0 0.75rem;
-  color: var(--muted, #666);
+  margin: 8px 0 0;
+  color: var(--mp-text-muted);
+  font-size: 0.9rem;
+  line-height: 1.5;
+}
+.purpose-lab {
+  display: inline-block;
+  margin-right: 6px;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--mp-text-soft);
 }
 .activity {
-  border: 1px solid var(--border, #ddd);
-  border-radius: 8px;
-  padding: 0.75rem;
-  margin-bottom: 0.75rem;
-  background: rgba(0, 0, 0, 0.02);
+  border: 1px solid var(--mp-divider);
+  border-radius: var(--mp-radius-soft);
+  padding: 14px;
+  margin-bottom: 14px;
+  background: var(--mp-surface-tint);
+  box-shadow: var(--mp-shadow-card);
 }
 .act-head {
   display: flex;
@@ -513,8 +630,9 @@ h2 {
   flex-shrink: 0;
   font-size: 0.78rem;
   padding: 0.25rem 0.5rem;
-  color: var(--danger, #9b1c1c);
-  border-color: rgba(155, 28, 28, 0.35);
+  color: var(--mp-danger-fg);
+  border-color: #e5484d55;
+  background: var(--mp-danger-bg);
 }
 .danger-btn:disabled {
   opacity: 0.4;
@@ -523,14 +641,24 @@ h2 {
   width: 100%;
   margin-top: 0.25rem;
   margin-bottom: 0.5rem;
-  padding: 0.55rem;
+  padding: 0.65rem;
   border-style: dashed;
+  border-color: var(--mp-border-strong);
+  background: transparent;
+  color: var(--mp-text-muted);
+}
+.add-act:hover:not(:disabled) {
+  background: var(--mp-surface-tint);
+  color: var(--mp-text);
 }
 .badge {
   font-size: 0.75rem;
-  padding: 0.1rem 0.4rem;
+  padding: 0.15rem 0.5rem;
   border-radius: 999px;
-  background: var(--bg-accent, #eee);
+  background: #2d6a4f14;
+  border: 1px solid #2d6a4f33;
+  color: var(--mp-primary);
+  font-weight: 700;
 }
 .title-input {
   flex: 1;
@@ -539,14 +667,14 @@ h2 {
 .field {
   display: grid;
   gap: 0.25rem;
-  margin: 0.4rem 0;
+  margin: 0.45rem 0;
 }
 .think {
   margin: 0.4rem 0;
   padding: 0.55rem 0.7rem;
   border-radius: 8px;
-  background: color-mix(in srgb, var(--accent, #3b82f6) 8%, transparent);
-  border: 1px solid color-mix(in srgb, var(--accent, #3b82f6) 22%, transparent);
+  background: #2d6a4f0f;
+  border: 1px solid #2d6a4f28;
   font-size: 0.86rem;
   line-height: 1.45;
 }
@@ -555,24 +683,22 @@ h2 {
 .title-input {
   width: 100%;
 }
-.anchor {
-  margin: 0.25rem 0 0.5rem;
-}
 .candidates {
   border: none;
-  margin: 0;
+  margin: 0.35rem 0 0;
   padding: 0;
   display: grid;
-  gap: 0.35rem;
+  gap: 0.4rem;
 }
 .cand {
   display: grid;
   grid-template-columns: 1fr auto;
   gap: 0.5rem;
   align-items: center;
-  padding: 0.45rem 0.5rem;
-  border: 1px solid transparent;
-  border-radius: 6px;
+  padding: 0.55rem 0.65rem;
+  border: 1px solid var(--mp-divider);
+  border-radius: 10px;
+  background: var(--mp-surface);
 }
 .cand-main {
   display: grid;
@@ -582,8 +708,9 @@ h2 {
   min-width: 0;
 }
 .cand.on {
-  border-color: var(--brand);
-  background: rgba(15, 107, 92, 0.06);
+  border-color: #2d6a4f88;
+  background: #2d6a4f0f;
+  box-shadow: inset 3px 0 0 var(--mp-primary);
 }
 .prev {
   flex-shrink: 0;
@@ -605,27 +732,50 @@ h2 {
   font-size: 0.7rem;
   padding: 0.05rem 0.3rem;
   border-radius: 999px;
-  background: rgba(161, 92, 18, 0.15);
+  background: #f5a40024;
+  color: #8a5a00;
+  font-weight: 700;
 }
 .foot {
   display: flex;
   justify-content: space-between;
   align-items: center;
   gap: 1rem;
-  border-top: 1px solid var(--border, #ddd);
-  padding-top: 0.75rem;
+  border-top: 1px solid var(--mp-divider);
+  padding: 0.85rem 1.25rem;
+  background: var(--mp-surface-tint);
+  flex-shrink: 0;
 }
 .actions {
   display: flex;
   gap: 0.5rem;
 }
 .err {
-  color: var(--danger, #9b1c1c);
+  margin: 0;
+  padding: 0.65rem 1.25rem;
+  color: var(--mp-danger-fg);
+  background: var(--mp-danger-bg);
+  border-bottom: 1px solid #e5484d33;
 }
 .small {
   font-size: 0.85rem;
 }
 .mono {
   font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+}
+@media (max-width: 860px) {
+  .body {
+    grid-template-columns: 1fr;
+    grid-template-rows: auto 1fr;
+  }
+  .rail {
+    max-height: 168px;
+    border-right: none;
+    border-bottom: 1px solid var(--mp-border);
+    box-shadow: none;
+  }
+  .detail {
+    box-shadow: none;
+  }
 }
 </style>

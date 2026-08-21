@@ -170,6 +170,18 @@ function statusClass(status: string) {
   return `st-${status}`
 }
 
+function pillFor(status: string) {
+  if (/approved|done|complete/i.test(status)) return 'status-pill--ok'
+  if (/failed|error/i.test(status)) return 'status-pill--danger'
+  if (/awaiting|pending/i.test(status)) return 'status-pill--warn'
+  if (/running/i.test(status)) return 'status-pill--info'
+  return 'status-pill--neutral'
+}
+
+function statusLabel(status: string) {
+  return status.replace(/_/g, ' ')
+}
+
 function openViewer() {
   if (detail.value?.output?.content) viewerOpen.value = true
 }
@@ -177,33 +189,77 @@ function openViewer() {
 
 <template>
   <div class="page" v-if="canvas">
-    <div class="head">
-      <div>
-        <p class="eyebrow muted mono">Pipeline Runner</p>
-        <h1>{{ canvas.mission.name }}</h1>
-        <p class="muted">
+    <header class="page-header">
+      <div class="page-header__meta">
+        <p class="page-eyebrow">Mission</p>
+        <h1 class="page-title">{{ canvas.mission.name }}</h1>
+        <p class="page-subtitle">
           {{ canvas.mission.topic }} · {{ canvas.mission.masterDataVersion }} ·
           current {{ canvas.mission.currentNode }}
         </p>
       </div>
-    </div>
+      <div class="page-header__actions">
+        <NuxtLink class="btn" to="/missions">← 列表</NuxtLink>
+        <button type="button" class="btn" :disabled="busy" @click="refreshAll">
+          刷新
+        </button>
+      </div>
+    </header>
 
-    <section class="canvas card">
-      <button
-        v-for="n in canvas.nodes"
-        :key="n.node"
-        class="node"
-        :class="[{ active: selectedNode === n.node }, statusClass(n.status)]"
-        @click="selectedNode = n.node"
-      >
-        <span class="mono">{{ n.node }}</span>
-        <strong>{{ n.label }}</strong>
-        <span class="muted small">{{ n.artifactLabel }}</span>
-        <span class="badge">{{ n.status }}</span>
-        <span v-if="n.openBlockingDecisions" class="warn">
-          {{ n.openBlockingDecisions }} decisions
-        </span>
-      </button>
+    <section class="stats">
+      <div class="stat-card">
+        <span class="stat-card__label">Current</span>
+        <span class="stat-card__value mono">{{ canvas.mission.currentNode }}</span>
+        <span class="stat-card__hint">Pipeline head</span>
+      </div>
+      <div class="stat-card">
+        <span class="stat-card__label">Selected</span>
+        <span class="stat-card__value mono">{{ selectedNode }}</span>
+        <span class="stat-card__hint">{{ current?.label || '—' }}</span>
+      </div>
+      <div class="stat-card">
+        <span class="stat-card__label">Status</span>
+        <span class="stat-card__value status-sm">{{
+          detail?.status || canvas.mission.status
+        }}</span>
+        <span class="stat-card__hint">Node run state</span>
+      </div>
+      <div class="stat-card">
+        <span class="stat-card__label">Blocking</span>
+        <span class="stat-card__value">{{
+          current?.openBlockingDecisions || 0
+        }}</span>
+        <span class="stat-card__hint">Open decisions</span>
+      </div>
+    </section>
+
+    <section class="canvas data-panel">
+      <div class="data-panel__toolbar">
+        <h2 class="data-panel__title">Pipeline nodes</h2>
+        <span class="muted">N0 – N5</span>
+      </div>
+      <div class="canvas-grid">
+        <button
+          v-for="n in canvas.nodes"
+          :key="n.node"
+          type="button"
+          class="node"
+          :class="[{ active: selectedNode === n.node }, statusClass(n.status)]"
+          @click="selectedNode = n.node"
+        >
+          <span class="mono node-id">{{ n.node }}</span>
+          <strong>{{ n.label }}</strong>
+          <span class="muted small">{{ n.artifactLabel }}</span>
+          <span
+            class="status-pill"
+            :class="pillFor(n.status)"
+            :title="n.status"
+          >{{ statusLabel(n.status) }}</span>
+          <span v-if="n.openBlockingDecisions" class="warn">
+            {{ n.openBlockingDecisions }} decisions
+          </span>
+        </button>
+      </div>
     </section>
 
     <section class="workbench" v-if="detail && current">
@@ -224,7 +280,7 @@ function openViewer() {
                 detail.status === 'awaiting_activity_selection'
               "
               type="button"
-              class="open-reader"
+              class="btn"
               @click="v031Open = true"
             >
               审选活动 / Component
@@ -236,7 +292,7 @@ function openViewer() {
                 detail.status === 'awaiting_review'
               "
               type="button"
-              class="open-reader"
+              class="btn"
               @click="editorOpen = true"
             >
               编辑 v0.3
@@ -248,14 +304,14 @@ function openViewer() {
                 detail.status === 'awaiting_review'
               "
               type="button"
-              class="open-reader"
+              class="btn"
               @click="v04EditorOpen = true"
             >
               编辑 v0.4
             </button>
             <a
               v-if="selectedNode === 'N4' && detail.output?.content"
-              class="open-reader btn"
+              class="btn"
               :href="n4DownloadUrl('csv')"
               download="v0.5_mission_spec.csv"
             >
@@ -263,7 +319,7 @@ function openViewer() {
             </a>
             <a
               v-if="selectedNode === 'N4' && detail.output?.content"
-              class="open-reader btn"
+              class="btn"
               :href="n4DownloadUrl('xlsx')"
               download="v0.5_mission_spec.xlsx"
             >
@@ -272,7 +328,7 @@ function openViewer() {
             <button
               v-if="detail.output?.content"
               type="button"
-              class="open-reader"
+              class="btn"
               @click="openViewer"
             >
               打开阅读器
@@ -344,14 +400,22 @@ function openViewer() {
           <p v-if="!detail.decisions.length" class="muted">暂无待决策项</p>
           <ul v-else class="decisions">
             <li v-for="d in detail.decisions" :key="d.id">
-              <span class="badge" :class="d.severity">{{ d.severity }}</span>
+              <span
+                class="status-pill"
+                :class="
+                  d.severity === 'blocking'
+                    ? 'status-pill--danger'
+                    : 'status-pill--warn'
+                "
+                >{{ d.severity }}</span
+              >
               {{ d.question }}
               <span v-if="d.resolved" class="muted">· resolved</span>
               <div v-if="!d.resolved && d.options?.length" class="opts">
                 <button
                   v-for="opt in d.options"
                   :key="opt.id"
-                  class="opt"
+                  class="btn"
                   :disabled="busy"
                   @click="resolveDecision(d.id, opt.id)"
                 >
@@ -387,7 +451,9 @@ function openViewer() {
             审选活动 → Confirm v0.3
           </button>
           <button
-            :disabled="busy || !(current.canReject || detail.status === 'awaiting_review')"
+            :disabled="
+              busy || !(current.canReject || detail.status === 'awaiting_review')
+            "
             @click="rejectNode"
           >
             Reject
@@ -400,45 +466,92 @@ function openViewer() {
 </template>
 
 <style scoped>
-.head { margin-bottom: 1rem; }
-.eyebrow { margin: 0; letter-spacing: 0.04em; text-transform: uppercase; font-size: 0.75rem; }
-h1 { margin: 0.2rem 0; }
-.canvas {
+.status-sm {
+  font-size: 16px !important;
+  line-height: 1.3;
+  word-break: break-word;
+}
+.canvas-grid {
   display: grid;
   grid-template-columns: repeat(6, minmax(0, 1fr));
   gap: 0.6rem;
-  margin-bottom: 1rem;
+  padding: 16px 18px 18px;
 }
 .node {
   display: grid;
-  gap: 0.2rem;
+  gap: 0.35rem;
   text-align: left;
-  padding: 0.75rem;
+  padding: 0.85rem;
   min-height: 7.5rem;
-  border-width: 2px;
+  min-width: 0;
+  overflow: hidden;
+  border: 1px solid var(--mp-divider);
+  border-radius: var(--mp-radius-soft);
+  background: var(--mp-surface);
+  box-shadow: none;
 }
-.node.active { border-color: var(--brand); box-shadow: var(--shadow); }
-.small { font-size: 0.8rem; }
-.badge {
-  display: inline-block;
-  width: fit-content;
-  font-size: 0.75rem;
-  padding: 0.1rem 0.4rem;
-  border-radius: 999px;
-  background: var(--bg-accent);
+.node > strong,
+.node > .muted {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
-.warn { color: var(--warn); font-size: 0.8rem; }
-.st-approved { background: rgba(31, 107, 58, 0.08); }
-.st-awaiting_review { background: rgba(161, 92, 18, 0.1); }
-.st-awaiting_activity_selection { background: rgba(15, 90, 140, 0.1); }
-.st-running { background: rgba(15, 107, 92, 0.1); }
-.st-failed { background: rgba(155, 28, 28, 0.08); }
+.node :deep(.status-pill),
+.node .status-pill {
+  max-width: 100%;
+  width: 100%;
+  min-width: 0;
+  box-sizing: border-box;
+  display: flex;
+  align-items: flex-start;
+  white-space: normal;
+  overflow-wrap: anywhere;
+  line-height: 1.3;
+  font-size: 11px;
+  padding: 4px 8px 4px 8px;
+}
+.node-id {
+  font-size: 11px;
+  letter-spacing: 0.08em;
+  color: var(--mp-accent);
+  font-weight: 700;
+}
+.node.active {
+  border-color: var(--mp-primary);
+  box-shadow: var(--mp-shadow-card);
+  background: #2d6a4f0a;
+}
+.small {
+  font-size: 0.8rem;
+}
+.warn {
+  color: var(--mp-warn);
+  font-size: 0.8rem;
+}
+.st-approved {
+  background: var(--mp-ok-bg);
+}
+.st-awaiting_review {
+  background: #a15c1212;
+}
+.st-awaiting_activity_selection {
+  background: #2d6a4f12;
+}
+.st-running {
+  background: #2d6a4f18;
+}
+.st-failed {
+  background: var(--mp-danger-bg);
+}
 .workbench {
   display: grid;
   grid-template-columns: 1.2fr 1.2fr 0.8fr;
   gap: 0.75rem;
 }
-.pane h3 { margin: 0; }
+.pane h3 {
+  margin: 0;
+  font-size: 15px;
+}
 .pane-head {
   display: flex;
   align-items: center;
@@ -451,14 +564,6 @@ h1 { margin: 0.2rem 0; }
   gap: 0.35rem;
   flex-wrap: wrap;
 }
-.open-reader {
-  font-size: 0.8rem;
-  padding: 0.25rem 0.6rem;
-  text-decoration: none;
-  display: inline-flex;
-  align-items: center;
-  color: inherit;
-}
 .artifact-label {
   display: grid;
   gap: 0.15rem;
@@ -466,16 +571,16 @@ h1 { margin: 0.2rem 0; }
   text-align: left;
   margin: 0 0 0.55rem;
   padding: 0.55rem 0.7rem;
-  border: 1px dashed var(--line);
-  border-radius: 0.45rem;
-  background: rgba(15, 107, 92, 0.06);
+  border: 1px dashed var(--mp-border-strong);
+  border-radius: var(--mp-radius-soft);
+  background: #2d6a4f0a;
   cursor: pointer;
   font: inherit;
   color: inherit;
 }
 .artifact-label:hover:not(:disabled) {
-  border-color: var(--brand);
-  background: rgba(15, 107, 92, 0.1);
+  border-color: var(--mp-primary);
+  background: #2d6a4f14;
 }
 .artifact-label:disabled {
   cursor: default;
@@ -483,37 +588,55 @@ h1 { margin: 0.2rem 0; }
 }
 .label-main {
   font-weight: 700;
-  color: var(--brand-ink);
+  color: var(--mp-primary-deep);
 }
 .hint {
   font-size: 0.75rem;
-  color: var(--brand);
+  color: var(--mp-primary);
 }
 .body {
   margin: 0;
   max-height: 420px;
   overflow: auto;
   white-space: pre-wrap;
-  background: #f7f1e6;
+  background: var(--mp-surface-tint);
   padding: 0.75rem;
-  border-radius: 0.4rem;
-  border: 1px solid var(--line);
+  border-radius: var(--mp-radius-soft);
+  border: 1px solid var(--mp-divider);
 }
 .body.preview.clickable {
   cursor: pointer;
 }
 .body.preview.clickable:hover {
-  border-color: var(--brand);
+  border-color: var(--mp-primary);
 }
-.side { display: grid; gap: 0.75rem; align-content: start; }
-.actions { display: grid; gap: 0.5rem; }
-.decisions { padding-left: 1rem; margin: 0; display: grid; gap: 0.5rem; }
-.opts { display: flex; flex-wrap: wrap; gap: 0.35rem; margin-top: 0.35rem; }
-.opt { font-size: 0.8rem; padding: 0.25rem 0.5rem; }
-.blocking { background: #fde8e8; color: var(--danger); }
-.err { color: var(--danger); margin: 0; }
+.side {
+  display: grid;
+  gap: 0.75rem;
+  align-content: start;
+}
+.actions {
+  display: grid;
+  gap: 0.5rem;
+}
+.decisions {
+  padding-left: 1rem;
+  margin: 0;
+  display: grid;
+  gap: 0.75rem;
+}
+.opts {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.35rem;
+  margin-top: 0.35rem;
+}
 @media (max-width: 960px) {
-  .canvas { grid-template-columns: repeat(2, 1fr); }
-  .workbench { grid-template-columns: 1fr; }
+  .canvas-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+  .workbench {
+    grid-template-columns: 1fr;
+  }
 }
 </style>
